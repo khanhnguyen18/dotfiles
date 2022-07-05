@@ -10,6 +10,7 @@
 - [[#important-put-this-in-your-initel][IMPORTANT! PUT THIS IN YOUR INIT.EL]]
 - [[#about-this-config][ABOUT THIS CONFIG]]
 - [[#a-few-programs-to-load-first][A FEW PROGRAMS TO LOAD FIRST]]
+  - [[#set-the-f5-key-only-for-testing][Set the F5 key only for testing]]
   - [[#display-line-numbers-and-truncated-lines][Display Line Numbers and Truncated Lines]]
 
 * IMPORTANT! PUT THIS IN YOUR INIT.EL
@@ -27,6 +28,11 @@ I don't want to use init.el config emacs
 
 * A FEW PROGRAMS TO LOAD FIRST
 The order in which the various Emacs modules load is very important.  So the very first code block is going to contain essential modules that many other modules will depend on later in this config.
+
+** Set the F5 key only for testing
+#+begin_src emacs-lisp
+(global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))))
+#+end_src
 
 ** Display Line Numbers and Truncated Lines
 #+begin_src emacs-lisp
