@@ -1,0 +1,35 @@
+#+TITLE: Khanh's GNU Emacs Config
+#+AUTHOR: Khanh Nguyen (Khanh)
+#+DESCRIPTION: Khanh's personal Emacs config.
+#+STARTUP: showeverything
+#+EXPORT_FILE_NAME: ~/Org/html/config.html
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+OPTIONS: num:nil ^:{}
+
+* TABLE OF CONTENTS    :TOC:
+- [[#important-put-this-in-your-initel][IMPORTANT! PUT THIS IN YOUR INIT.EL]]
+- [[#about-this-config][ABOUT THIS CONFIG]]
+- [[#a-few-programs-to-load-first][A FEW PROGRAMS TO LOAD FIRST]]
+  - [[#display-line-numbers-and-truncated-lines][Display Line Numbers and Truncated Lines]]
+
+* IMPORTANT! PUT THIS IN YOUR INIT.EL
+I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (config.org).
+
+#+begin_example
+(org-babel-load-file
+ (expand-file-name
+  "config.org"
+  user-emacs-directory))
+#+end_example
+
+* ABOUT THIS CONFIG
+I don't want to use init.el config emacs
+
+* A FEW PROGRAMS TO LOAD FIRST
+The order in which the various Emacs modules load is very important.  So the very first code block is going to contain essential modules that many other modules will depend on later in this config.
+
+** Display Line Numbers and Truncated Lines
+#+begin_src emacs-lisp
+(global-display-line-numbers-mode 1)
+(global-visual-line-mode t)
+#+end_src
