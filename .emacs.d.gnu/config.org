@@ -12,6 +12,19 @@
 - [[#a-few-programs-to-load-first][A FEW PROGRAMS TO LOAD FIRST]]
   - [[#set-the-f5-key-only-for-testing][Set the F5 key only for testing]]
   - [[#display-line-numbers-and-truncated-lines][Display Line Numbers and Truncated Lines]]
+  - [[#setup-packageel-to-work-with-melpa][Setup Package.el To Work With MELPA]]
+  - [[#use-package][Use-Package]]
+  - [[#evil-mode][Evil Mode]]
+  - [[#general-keybindings][General Keybindings]]
+- [[#startup-performance][STARTUP PERFORMANCE]]
+  - [[#garbage-collection][Garbage collection]]
+  - [[#native-compil][Native Compil]]
+- [[#all-the-icons][ALL THE ICONS]]
+- [[#buffers-and-bookmarks][BUFFERS AND BOOKMARKS]]
+- [[#fonts][FONTS]]
+  - [[#setting-the-font-face][Setting The Font Face]]
+  - [[#zooming-in-and-out][Zooming In and Out]]
+- [[#theme][THEME]]
 
 * IMPORTANT! PUT THIS IN YOUR INIT.EL
 I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (config.org).
@@ -30,12 +43,268 @@ I don't want to use init.el config emacs
 The order in which the various Emacs modules load is very important.  So the very first code block is going to contain essential modules that many other modules will depend on later in this config.
 
 ** Set the F5 key only for testing
+This is a cheat for testing my function
 #+begin_src emacs-lisp
 (global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))))
+(global-set-key (kbd "<f2>") (lambda() (interactive) (org-babel-execute-src-block)))
+
 #+end_src
 
+#+RESULTS:
+| lambda | nil | (interactive) | (org-babel-execute-src-block) |
+
+** Setup Package.el To Work With MELPA
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
+(package-refresh-contents)
+(package-initialize)
+#+end_src
+** Use-Package
+Install use-package and enable ':ensure t' globally.  The ':ensure' keyword causes the package(s) within use-package statements to be installed automatically if not already present on your system.  To avoid having to add ':ensure t' to every use-package statement in this config, I set 'use-package-always-ensure'.
+
+#+begin_src emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(setq use-package-always-ensure t)
+#+end_src
+** Evil Mode
+Evil is an extensible 'vi' layer for Emacs. It emulates the main features of Vim, and provides facilities for writing custom extensions.  Evil Collection is also installed since it adds 'evil' bindings to parts of Emacs that the standard Evil package does not cover, such as: calenda, help-mode adn ibuffer.
+  
+#+begin_src emacs-lisp
+(use-package evil
+  :init      ;; tweak evil's configuration before loading it
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+  (setq evil-vsplit-window-right t)
+  (setq evil-split-window-below t)
+  (evil-mode))
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-collection-mode-list '(dashboard dired ibuffer))
+  (evil-collection-init))
+(use-package evil-tutor)
+#+end_src
+
+** General Keybindings
+General.el allows us to set keybindings.  As a longtime Doom Emacs user, I have grown accustomed to using SPC as the prefix key.  General makes setting keybindings (especially with SPC) much easier.  All of the keybindings we set later in the config depend on general being loaded.
+
+#+begin_src emacs-lisp
+(use-package general
+  :config
+  (general-evil-setup t))
+#+end_src
+
+
+* STARTUP PERFORMANCE
+  This section is where it make emacs faster to load.
+** Garbage collection
+Makes startup faster by reducing the frequency of garbage collection
+#+begin_src emacs-lisp
+;; Using garbage magic hack.
+ (use-package gcmh
+   :config
+   (gcmh-mode 1))
+;; Setting garbage collection threshold
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+;; Silence compiler warnings as they can be pretty disruptive (setq comp-async-report-warnings-errors nil)
+#+end_src
+** Native Compil
+#+begin_src emacs-lisp
+;; Silence compiler warnings as they can be pretty disruptive
+(if (boundp 'comp-deferred-compilation)
+    (setq comp-deferred-compilation nil)
+    (setq native-comp-deferred-compilation nil))
+;; In noninteractive sessions, prioritize non-byte-compiled source files to
+;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
+;; to skip the mtime checks on every *.elc file.
+(setq load-prefer-newer noninteractive)
+#+end_src
+
+* ALL THE ICONS
+This is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
+
+#+begin_src emacs-lisp
+(use-package all-the-icons)
+#+end_src
+
+* BUFFERS AND BOOKMARKS
+
+#+begin_src emacs-lisp
+(nvmap :prefix "SPC"
+       "b b"   '(ibuffer :which-key "Ibuffer")
+       "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
+       "b k"   '(kill-current-buffer :which-key "Kill current buffer")
+       "b n"   '(next-buffer :which-key "Next buffer")
+       "b p"   '(previous-buffer :which-key "Previous buffer")
+       "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
+       "b K"   '(kill-buffer :which-key "Kill buffer"))
+#+end_src
+
+* FONTS
+Defining our fonts.  Right now I'm using Source Code Pro (SauceCodePro) from the nerd-fonts repository.  Installed from the AUR, it does =NOT= include all variations of the font (such as italics).  You can download the italics Source Code Pro font from the nerd-fonts GitHub though.
+
+** Setting The Font Face
+#+begin_src emacs-lisp
+  ;; (set-face-attribute 'default nil
+  ;;   :font "SauceCodePro Nerd Font Mono"
+  ;;   :height 110
+  ;;   :weight 'medium)
+  ;; (set-face-attribute 'fixed-pitch nil
+  ;;   :font "SauceCodePro Nerd Font Mono"
+  ;;   :height 110
+  ;;   :weight 'medium)
+  ;; Makes commented text and keywords italics.
+  ;; This is working in emacsclient but not emacs.
+  ;; Your font must have an italic face available.
+  ;; (set-face-attribute 'font-lock-comment-face nil
+  ;;   :slant 'italic)
+  ;; (set-face-attribute 'font-lock-keyword-face nil
+  ;;   :slant 'italic)
+
+  ;; Uncomment the following line if line spacing needs adjusting.
+  ;;(setq-default line-spacing 0.12)
+
+  ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+  ;; (add-to-list 'default-frame-alist '(font . "Source Code Pro-11"))
+  ;; changes certain keywords to symbols, such as lamda!
+  ;; (setq global-prettify-symbols-mode t)
+#+end_src
+
+** Zooming In and Out
+You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
+
+#+begin_src emacs-lisp
+;; zoom in/out like we do everywhere else.
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+#+end_src
+
+
+* THEME
+We need a nice colorscheme.  The Doom Emacs guys have a nice collection of themes, so let's install them!
+
+#+begin_src emacs-lisp
+(use-package doom-themes)
+(setq doom-themes-enable-bold nil    ; if nil, bold is universally disabled
+      doom-themes-enable-italic t) ; if nil, italics is universally disabled
+(load-theme 'doom-badger t)
+#+end_src
+
+* ORG
+
+** Defining A Few Things
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'org-indent-mode)
+(setq org-directory "~/Org/"
+      org-agenda-files '("~/Org/agenda.org")
+      org-default-notes-file (expand-file-name "notes.org" org-directory)
+      org-ellipsis " ▼ "
+      org-log-done 'time
+      org-journal-dir "~/Org/journal/"
+      org-journal-date-format "%B %d, %Y (%A) "
+      org-journal-file-format "%Y-%m-%d.org"
+      org-hide-emphasis-markers t)
+(setq org-src-preserve-indentation nil
+      org-src-tab-acts-natively t
+      org-edit-src-content-indentation 0)
+#+end_src
+
+** Enabling Org Bullets
+Org-bullets gives us attractive bullets rather than asterisks.
+#+begin_src emacs-lisp
+  (use-package org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+** Source Code Block Tag Expansion
+Org-tempo is a package that allows for '<s' followed by TAB to expand to a begin_src tag.  Other expansions available include:
+
+| Typing the below + TAB | Expands to ...                          |
+|------------------------+-----------------------------------------|
+| <a                     | '#+BEGIN_EXPORT ascii' … '#+END_EXPORT  |
+| <c                     | '#+BEGIN_CENTER' … '#+END_CENTER'       |
+| <C                     | '#+BEGIN_COMMENT' … '#+END_COMMENT'     |
+| <e                     | '#+BEGIN_EXAMPLE' … '#+END_EXAMPLE'     |
+| <E                     | '#+BEGIN_EXPORT' … '#+END_EXPORT'       |
+| <h                     | '#+BEGIN_EXPORT html' … '#+END_EXPORT'  |
+| <l                     | '#+BEGIN_EXPORT latex' … '#+END_EXPORT' |
+| <q                     | '#+BEGIN_QUOTE' … '#+END_QUOTE'         |
+| <s                     | '#+BEGIN_SRC' … '#+END_SRC'             |
+| <v                     | '#+BEGIN_VERSE' … '#+END_VERSE'         |
+
+#+begin_src emacs-lisp
+(use-package org-tempo
+  :ensure nil) ;; tell use-package not to try to install org-tempo since it's already there.
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+#+end_src
+** Remove asking from babel
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+#+end_src
+
+* SOME UI TWEAKS
 ** Display Line Numbers and Truncated Lines
 #+begin_src emacs-lisp
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
 #+end_src
+** Increase font size
+*** For gnu
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook (lambda () (text-scale-set 1)))
+#+end_src
+*** For doom
+#+begin_src emacs-lisp :tangle common.el
+(add-hook 'org-mode-hook (lambda () (text-scale-set 3)))
+#+end_src
+** Colors
+*** For gnu emacs
+#+begin_src emacs-lisp 
+(setq custom--inhibit-theme-enable nil)
+(custom-theme-set-faces
+ 'doom-badger
+ '(org-level-1 ((t (:foreground "yellow"))))
+ '(org-level-2 ((t (:foreground "orange"))))
+ '(org-level-3 ((t (:foreground "cyan"))))
+)
+#+end_src
+
+#+RESULTS:
+
+*** For doom emacs
+#+begin_src emacs-lisp :tangle common.el
+(setq custom--inhibit-theme-enable nil)
+(custom-theme-set-faces
+ 'doom-badger
+ '(org-level-1 ((t (:foreground "yellow"))))
+ '(org-level-2 ((t (:foreground "orange"))))
+ '(org-level-3 ((t (:foreground "cyan"))))
+)
+#+end_src
+
+#+RESULTS
+
+** Fix issue for metakey only on Doom Emacs
+MacOS when use bluetooth device map meta key error. Need deploy code to fix it.
+
+#+begin_src emacs-lisp :tangle common.el
+(setq mac-right-option-modifier 'super)
+#+end_src
+
+#+RESULTS:
+: super
