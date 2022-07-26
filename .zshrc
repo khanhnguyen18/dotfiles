@@ -1,6 +1,5 @@
 DISPLAY=1 SSH_ASKPASS="/Users/khanh/SOFT/aduro/aduro_passphase.sh" ssh-add ~/.ssh/id_aduro < /dev/null
-eval "$(ssh-agent -s)"
-
+# eval "$(ssh-agent -s)"
 # My alias
 alias copy_aduro_pass="echo 'NewUser1!' | tr -d '\n' | pbcopy"
 alias common="emacs $HOME/Dropbox/work/common.org"
@@ -31,3 +30,4 @@ export PATH="$PATH:$HOME/.emacs.d/bin"
 export PATH="/usr/local/opt/php@7.2/bin:$PATH"
 alias python='python3'
 
+export PATH="$PATH:/Library/TeX/texbin"

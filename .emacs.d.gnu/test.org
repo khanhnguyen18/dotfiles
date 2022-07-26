@@ -1,11 +1,28 @@
-dffff
+#+title: I Can Do It
+#+author: Khanh ND
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+OPTIONS: toc:nil num:2 title:nil author:nil date:nil
+#+latex_header: \usepackage{fontspec}
+#+latex_header: \setmainfont{Arial}
 
-ff
-f
-f
-f
-f
+Hello, world.
+~code goes here~.
+nguyễn duy khanh
+A 我-⍋+☀APPLE🙋ZEBRAp
+** Latex                                                          :noexport:
+*** Code
+#+begin_src emacs-lisp :results silent
+(setq org-latex-compiler "xelatex")
+(setq org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f %f"))
+(add-to-list 'org-latex-packages-alist '("" "fontspec"))
+(add-to-list 'org-latex-packages-alist '("" "khanh"))
+#+end_src
 
-f
-f
-f
+#+begin_src emacs-lisp :results silent(setq org-latex-compiler "xelatex")
+(setq org-latex-compiler "xelatex")
+
+(setq org-latex-to-pdf-process 
+  '("xelatex -interaction nonstopmode %f"
+     "xelatex -interaction nonstopmode %f")) 
+
+#+end_src

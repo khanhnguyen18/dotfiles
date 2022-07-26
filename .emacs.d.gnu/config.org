@@ -11,7 +11,6 @@
 - [[#about-this-config][ABOUT THIS CONFIG]]
 - [[#a-few-programs-to-load-first][A FEW PROGRAMS TO LOAD FIRST]]
   - [[#set-the-f5-key-only-for-testing][Set the F5 key only for testing]]
-  - [[#display-line-numbers-and-truncated-lines][Display Line Numbers and Truncated Lines]]
   - [[#setup-packageel-to-work-with-melpa][Setup Package.el To Work With MELPA]]
   - [[#use-package][Use-Package]]
   - [[#evil-mode][Evil Mode]]
@@ -25,6 +24,20 @@
   - [[#setting-the-font-face][Setting The Font Face]]
   - [[#zooming-in-and-out][Zooming In and Out]]
 - [[#theme][THEME]]
+- [[#org][ORG]]
+  - [[#defining-a-few-things][Defining A Few Things]]
+  - [[#enabling-org-bullets][Enabling Org Bullets]]
+  - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
+  - [[#remove-asking-from-babel][Remove asking from babel]]
+- [[#some-ui-tweaks][SOME UI TWEAKS]]
+  - [[#display-line-numbers-and-truncated-lines][Display Line Numbers and Truncated Lines]]
+  - [[#increase-font-size][Increase font size]]
+  - [[#colors][Colors]]
+  - [[#fix-issue-for-metakey-only-on-doom-emacs][Fix issue for metakey only on Doom Emacs]]
+  - [[#set-the-f5-key-only-for-testing-1][Set the F5 key only for testing]]
+  - [[#map-another-key][Map another key]]
+  - [[#org-bullet][Org bullet]]
+  - [[#org-export-pdf][ORG Export PDF]]
 
 * IMPORTANT! PUT THIS IN YOUR INIT.EL
 I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (config.org).
@@ -158,7 +171,27 @@ This is an icon set that can be used with dashboard, dired, ibuffer and other Em
 Defining our fonts.  Right now I'm using Source Code Pro (SauceCodePro) from the nerd-fonts repository.  Installed from the AUR, it does =NOT= include all variations of the font (such as italics).  You can download the italics Source Code Pro font from the nerd-fonts GitHub though.
 
 ** Setting The Font Face
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle config.org :tangle common.el
+;(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 200)
+ ; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+;  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+ ; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+ ; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+ ; (dolist (face '((org-level-1 . 1.2)
+  ;                (org-level-2 . 1.15)
+   ;               (org-level-3 . 1.1)
+   ;               (org-level-4 . 1.05)
+   ;               (org-level-5 . 1.1)
+   ;               (org-level-6 . 1.1)
+   ;               (org-level-7 . 1.1)
+   ;               (org-level-8 . 1.1)))
+   ; (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
+
+
   ;; (set-face-attribute 'default nil
   ;;   :font "SauceCodePro Nerd Font Mono"
   ;;   :height 110
@@ -184,6 +217,9 @@ Defining our fonts.  Right now I'm using Source Code Pro (SauceCodePro) from the
   ;; (setq global-prettify-symbols-mode t)
 #+end_src
 
+#+RESULTS:
+: #<buffer config.org>
+
 ** Zooming In and Out
 You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
 
@@ -205,6 +241,9 @@ We need a nice colorscheme.  The Doom Emacs guys have a nice collection of theme
       doom-themes-enable-italic t) ; if nil, italics is universally disabled
 (load-theme 'doom-badger t)
 #+end_src
+
+#+RESULTS:
+: t
 
 * ORG
 
@@ -247,8 +286,8 @@ Org-tempo is a package that allows for '<s' followed by TAB to expand to a begin
 | <s                     | '#+BEGIN_SRC' … '#+END_SRC'             |
 | <v                     | '#+BEGIN_VERSE' … '#+END_VERSE'         |
 
-#+begin_src emacs-lisp
-(use-package org-tempo
+#+begin_src emacs-lisp :tangle config.el :tangle common.el
+(use-package! org-tempo
   :ensure nil) ;; tell use-package not to try to install org-tempo since it's already there.
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 #+end_src
@@ -256,6 +295,9 @@ Org-tempo is a package that allows for '<s' followed by TAB to expand to a begin
 #+begin_src emacs-lisp
 (setq org-confirm-babel-evaluate nil)
 #+end_src
+
+#+RESULTS:
+: #<buffer config.org>
 
 * SOME UI TWEAKS
 ** Display Line Numbers and Truncated Lines
@@ -283,28 +325,81 @@ Org-tempo is a package that allows for '<s' followed by TAB to expand to a begin
  '(org-level-3 ((t (:foreground "cyan"))))
 )
 #+end_src
+#+RESULTS:
+: #<buffer config.org>
+
+*** for doom emacs
+#+begin_src emacs-lisp :tangle common.el
+(use-package! org
+  :config
+  (set-face-attribute 'org-level-1 nil :font "Cantarell" :weight 'regular :height 1.3)
+  (set-face-attribute 'org-level-2 nil :font "Cantarell" :weight 'regular :height 1.2)
+  (set-face-attribute 'org-level-3 nil :font "Cantarell" :weight 'regular :height 1.1)
+)
+; màu vàng :foreground "#ffad29"
+
+#+end_src
 
 #+RESULTS:
+: #<buffer config.org>
 
-*** For doom emacs
-#+begin_src emacs-lisp :tangle common.el
+#+begin_src emacs-lisp
 (setq custom--inhibit-theme-enable nil)
 (custom-theme-set-faces
  'doom-badger
- '(org-level-1 ((t (:foreground "yellow"))))
- '(org-level-2 ((t (:foreground "orange"))))
- '(org-level-3 ((t (:foreground "cyan"))))
+ '(org-level-1 ((t (:foreground "#66D9EF"))))
+ '(org-level-2 ((t (:foreground "green1"))))
+ '(org-level-3 ((t (:foreground "orange"))))
+ '(cursor      ((t (:background "yellow"))))
 )
 #+end_src
-
-#+RESULTS
 
 ** Fix issue for metakey only on Doom Emacs
 MacOS when use bluetooth device map meta key error. Need deploy code to fix it.
 
 #+begin_src emacs-lisp :tangle common.el
-(setq mac-right-option-modifier 'super)
+(setq mac-right-option-modifier 'meta)
 #+end_src
 
 #+RESULTS:
 : super
+** Set the F5 key only for testing
+This is a cheat for testing my function
+#+begin_src emacs-lisp :tangle common.el
+(global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-execute-src-block)))
+#+end_src
+
+#+RESULTS:
+: #<buffer config.org>
+** Map another key
+#+begin_src emacs-lisp :tangle common.el
+(define-key evil-insert-state-map (kbd "C-n") 'next-line)
+(define-key evil-insert-state-map (kbd "C-n") 'next-line)
+
+(define-key evil-insert-state-map (kbd "C-d") 'delete-char)
+(define-key evil-insert-state-map (kbd "C-u") 'delete-backward-char)
+#+end_src
+
+#+RESULTS:
+: #<buffer config.org>
+** Org bullet
+
+#+begin_src emacs-lisp :tangle common.el
+(setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
+
+#+end_src
+
+#+RESULTS:
+: super
+** ORG Export PDF
+#+begin_src emacs-lisp :tangle common.el
+(setq org-latex-compiler "xelatex")
+
+(setq org-latex-to-pdf-process
+  '("xelatex -interaction nonstopmode %f"
+     "xelatex -interaction nonstopmode %f"))
+
+#+end_src
+
+#+RESULTS:
+: #<buffer config.org>
