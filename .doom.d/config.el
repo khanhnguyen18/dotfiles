@@ -35,16 +35,6 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
-(setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
-
-(setenv "PATH"
-        (concat "/Library/TeX/texbin" ":"
-                (getenv "PATH")))
-
-;; Set the bulld
-;;(setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿"))
-;;
-(load! "~/.emacs.d.gnu/common.el")
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
@@ -62,4 +52,6 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-(map! "<f5>" (lambda() (interactive) (org-babel-execute-src-block)))
+(after! org
+(org-babel-load-file
+ (expand-file-name "doom-config.org" "~/.doom.d")))
