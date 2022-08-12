@@ -285,8 +285,8 @@ Org-tempo is a package that allows for '<s' followed by TAB to expand to a begin
 | <s                     | '#+BEGIN_SRC' … '#+END_SRC'             |
 | <v                     | '#+BEGIN_VERSE' … '#+END_VERSE'         |
 
-#+begin_src emacs-lisp :tangle config.el
-(use-package! org-tempo
+#+begin_src emacs-lisp
+(use-package org-tempo
   :ensure nil) ;; tell use-package not to try to install org-tempo since it's already there.
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 #+end_src

@@ -1,5 +1,5 @@
-(global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))))
-(global-set-key (kbd "<f2>") (lambda() (interactive) (org-babel-execute-src-block)))
+(global-set-key (kbd "<f2>") (lambda() (interactive) (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))))
+(global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-execute-src-block)))
 
 (require 'package)
 (add-to-list 'package-archives
@@ -96,6 +96,10 @@
 (use-package org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
+(use-package org-tempo
+  :ensure nil) ;; tell use-package not to try to install org-tempo since it's already there.
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+
 (setq org-confirm-babel-evaluate nil)
 
 (global-display-line-numbers-mode 1)
@@ -111,11 +115,23 @@
  '(org-level-3 ((t (:foreground "cyan"))))
 )
 
-(setq custom--inhibit-theme-enable nil)
-(custom-theme-set-faces
- 'doom-badger
- '(org-level-1 ((t (:foreground "#66D9EF"))))
- '(org-level-2 ((t (:foreground "green1"))))
- '(org-level-3 ((t (:foreground "orange"))))
- '(cursor      ((t (:background "yellow"))))
-)
+(global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-execute-src-block)))
+
+(setenv "PATH"
+        (concat "/Library/TeX/texbin" ":"
+                (getenv "PATH")))
+
+
+(setq org-latex-compiler "xelatex")
+
+(setq org-latex-to-pdf-process
+  '("xelatex -interaction nonstopmode %f"
+     "xelatex -interaction nonstopmode %f"))
+
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)))

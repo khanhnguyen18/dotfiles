@@ -1,27 +1,45 @@
 (defun dk/org-mode-setup()
-  (text-scale-set 3)
-)
-
+  (text-scale-set 2)
+  ;(set-face-attribute 'default nil :font "Source Code Pro for Powerline" :weight 'medium :height 200);"Menlo"
+  ;(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 200)
+  ;(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  )
 (use-package! org
   :hook (org-mode . dk/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
   (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
 
-  (set-face-attribute 'org-level-1 nil :font "Cantarell" :weight 'regular :height 1.3)
-  (set-face-attribute 'org-level-2 nil :font "Cantarell" :weight 'regular :height 1.2)
+  (set-face-attribute 'org-level-1 nil :font "Cantarell" :weight 'regular :height 1.2)
+  (set-face-attribute 'org-level-2 nil :font "Cantarell" :weight 'regular :height 1.15)
   (set-face-attribute 'org-level-3 nil :font "Cantarell" :weight 'regular :height 1.1)
-)
-; màu vàng :foreground "#ffad29"
+  ;; Agenda
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-agenda-files
+        '("~/Dropbox/org/task.org"))
+  (setq org-todo-keywords
+      '((sequence "TODO(t)" "WORK(w)" "PROCESSING(p)" "|" "DONE(d)")))
+        )
+
+(setq org-todo-keyword-faces
+  '(("TODO" . "red")
+    ("WORK" . "orange")
+    ("PROCESSING"."yellow")
+    ("DONE"."green")
+))
 
 (use-package! org-tempo
   :config
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 
+(map! "<f2>" (lambda() (interactive) (+doom-dashboard/open (selected-frame))))
 (map! "<f5>" (lambda() (interactive) (org-babel-execute-src-block)))
+(map! "<f4>" (lambda() (interactive) (org-indent-block)))
+(map! "<f3>" (lambda() (interactive) (switch-to-buffer nil)))
 
 (use-package! org-roam
-  :ensure t
   :custom
   (org-roam-directory "~/Dropbox/RoamNotes")
   (org-roam-completion-everywhere t)
@@ -50,3 +68,13 @@
      "xelatex -interaction nonstopmode %f"))
 
 (setq mac-right-option-modifier 'meta)
+
+(map! "C-M-j" (lambda() (interactive) (+vertico/switch-workspace-buffer)))
+
+(defun system-move-file-to-trash (file)
+  (call-process (executable-find "trash") nil 0 nil file))
+
+(after! org-agenda
+  (org-babel-load-file
+   (expand-file-name "dashboard.org" "~/.doom.d"))
+)

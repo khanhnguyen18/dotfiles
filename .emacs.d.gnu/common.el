@@ -42,34 +42,4 @@
   ;; changes certain keywords to symbols, such as lamda!
   ;; (setq global-prettify-symbols-mode t)
 
-(use-package! org-tempo
-  :ensure nil) ;; tell use-package not to try to install org-tempo since it's already there.
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-
-(add-hook 'org-mode-hook (lambda () (text-scale-set 3)))
-
-(use-package! org
-  :config
-  (set-face-attribute 'org-level-1 nil :font "Cantarell" :weight 'regular :height 1.3)
-  (set-face-attribute 'org-level-2 nil :font "Cantarell" :weight 'regular :height 1.2)
-  (set-face-attribute 'org-level-3 nil :font "Cantarell" :weight 'regular :height 1.1)
-)
-; màu vàng :foreground "#ffad29"
-
 (setq mac-right-option-modifier 'meta)
-
-(global-set-key (kbd "<f5>") (lambda() (interactive) (org-babel-execute-src-block)))
-
-(define-key evil-insert-state-map (kbd "C-n") 'next-line)
-(define-key evil-insert-state-map (kbd "C-n") 'next-line)
-
-(define-key evil-insert-state-map (kbd "C-d") 'delete-char)
-(define-key evil-insert-state-map (kbd "C-u") 'delete-backward-char)
-
-(setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
-
-(setq org-latex-compiler "xelatex")
-
-(setq org-latex-to-pdf-process
-  '("xelatex -interaction nonstopmode %f"
-     "xelatex -interaction nonstopmode %f"))

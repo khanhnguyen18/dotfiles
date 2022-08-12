@@ -1,0 +1,192 @@
+(defun center-string-in-char (str len char)
+  (store-substring (make-string len char) (/ (- len (length str)) 2) str)
+                                        ;(concat str (make-string (- len (length str)) char ))
+  )
+(defun insert-section-heading(section-name color)
+  (let ((heading-text (center-string-in-char section-name 78 ?=)))
+    (insert
+     (propertize heading-text 'face `(:foreground ,color))
+     "\n"))
+  )
+
+(defun dashboard-agenda--formatted-headline ()
+  "Set agenda faces to `HEADLINE' when face text property is nil."
+  (let* ((headline (org-get-heading t t t t))
+         (todo (or (org-get-todo-state) ""))
+         (org-level-face (nth (- (org-outline-level) 1) org-level-faces))
+         (todo-state (format org-agenda-todo-keyword-format todo)))
+    (when (null (get-text-property 0 'face headline))
+      (add-face-text-property 0 (length headline) org-level-face t headline))
+    (when (null (get-text-property 0 'face todo-state))
+      (add-face-text-property 0 (length todo-state) (org-get-todo-face todo) t todo-state))
+    (concat todo-state " " headline)))
+
+(defun dashboard-agenda--formatted-time ()
+  "Get the scheduled or dead time of an entry.  If no time is found return nil."
+  (when-let ((time (or (org-get-scheduled-time (point)) (org-get-deadline-time (point)))))
+    (format-time-string "%Y-%m-%d" time)))
+
+(defun dashboard-agenda-entry-format ()
+  "Format agenda entry to show it on dashboard."
+  (let* ((scheduled-time (org-get-scheduled-time (point)))
+         (deadline-time (org-get-deadline-time (point)))
+         (entry-time (or scheduled-time deadline-time))
+         (item (org-agenda-format-item
+                (dashboard-agenda--formatted-time)
+                (dashboard-agenda--formatted-headline)
+                (org-outline-level)
+                (org-get-category)
+                (org-get-tags)))
+         (todo-state (org-get-todo-state))
+         (todo-index (and todo-state
+                          (length (member todo-state org-todo-keywords-1))))
+                                        ;(headline-len  (length (org-get-heading t t t t)))
+         (entry-data (list 'dashboard-agenda-time entry-time
+                           'dashboard-agenda-todo-index todo-index
+                                        ;'dashboard-headline-len headline-len
+                           'dashboard-agenda-file (buffer-file-name)
+                           'dashboard-agenda-loc (point))))
+    (add-text-properties 0 (length item) entry-data item)
+    item))
+
+(defvar org-agenda-prefix-format '())
+
+(defun dashboard-get-agenda (filter skip)
+  "Get agenda items for today or for a week from now."
+  (let ((dashboard-agenda-prefix-format "%-10s "))
+    (if-let ((prefix-format (assoc 'dashboard-agenda org-agenda-prefix-format)))
+        (setcdr prefix-format dashboard-agenda-prefix-format)
+      (push (cons 'dashboard-agenda dashboard-agenda-prefix-format) org-agenda-prefix-format))
+    (org-compile-prefix-format 'dashboard-agenda))
+
+  (org-map-entries 'dashboard-agenda-entry-format
+                   filter
+                   'agenda
+                   skip))
+
+(defun create-todo-widget (element action)
+   (widget-create 'item
+                  :tag element
+                  :notify 'action
+                  )
+  ;(insert-text-button element)
+  ;(insert "\n")
+  )
+
+(defun doom-dashboard-agenda-section ()
+  (insert-section-heading "Agenda task" "orange")
+  (let ((list (dashboard-get-agenda "/+TODO" nil)))
+    (dolist (element
+             (sort list
+                   (lambda (entry1 entry2)
+                     (let ((arg1 (get-text-property 0 'dashboard-agenda-time entry1))
+                           (arg2 (get-text-property 0 'dashboard-agenda-time entry2)))
+                       (time-less-p arg1 arg2)))))
+      (create-todo-widget
+       element
+       (lambda (&rest ignore)
+                               (find-file "~/Dropbox/org/task.org")))
+    ;  (widget-create 'item
+     ;                :tag element
+      ;               :notify (lambda (&rest ignore)
+       ;                        (find-file "~/Dropbox/org/task.org"))
+                    ; :format (create-button-text (get-text-property 0 'dashboard-headline-len element))
+
+                    ; )
+                                        ; (insert
+                                        ; (with-temp-buffer
+                                        ;  (insert-text-button element
+                                        ;                     'action `(lambda (_) (find-file "~/Dropbox/org/task.org"))
+                                        ;                    'follow-link t
+                                        ;                   ;'face 'doom-dashboard-menu-title
+                                        ;                  )
+                                        ;(format "%-78s" (buffer-string))))
+                                        ;    (widget-create 'item
+                                        ;            :tag element
+                                        ;            :action (lambda (&rest _)
+
+                                        ;                       (find-file "~/Dropbox/org/task.org")
+                                        ;            )
+                                        ;           :notify (lambda (&rest ignore)
+                                        ;                    (find-file "~/Dropbox/org/task.org"))
+                                        ;          )
+                                        ;
+      )))
+
+(defun done-today ()
+  (let ((scheduled-time (substring (org-entry-get (point) "CLOSED") 1 11))
+        (today-date (format-time-string "%Y-%m-%d")))
+
+    (unless (and scheduled-time
+                 (string= scheduled-time today-date))
+      (point))
+    )
+  )
+(defun doom-dashboard-done-section ()
+  (insert-section-heading "Done By Today" "green")
+  (let ((list (dashboard-get-agenda "/+DONE" 'done-today)))
+    (dolist (element list )
+      (create-todo-widget
+       element
+       (lambda (&rest ignore)
+         (find-file "~/Dropbox/org/task.org")))
+      )))
+
+(defun doom-dashboard-create-file-button (icon text link)
+  (insert
+   (with-temp-buffer
+     (insert-text-button (format "%3s\t%s"
+                                 (all-the-icons-faicon icon :face 'doom-dashboard-menu-title :v-adjust 0.01)
+                                 text)
+                         'action
+                         `(lambda (_) (find-file ,link))
+                         'follow-link t
+                         'face 'doom-dashboard-menu-title
+                         'help-echo (format "Open %s" text))
+     (format "%-79s" (buffer-string)))))
+(defun doom-dashboard-files-section ()
+  (insert-section-heading "Files" "orange")
+
+  (doom-dashboard-create-file-button "calendar-check-o" "Task.org" "~/Dropbox/org/Task.org")
+  (insert "\n")
+  (doom-dashboard-create-file-button "pie-chart" "Work.org" "~/Dropbox/work/daily/work.org")
+  (insert "\n")
+  (doom-dashboard-create-file-button "laptop" "Config.org" "~/.doom.d/doom-config.org")
+  (insert "\n")
+  (doom-dashboard-create-file-button "database" "Dashboard.org" "~/.doom.d/dashboard.org")
+  (insert "\n")
+  (doom-dashboard-create-file-button "bicycle" "Running.org" "~/Dropbox/running/Running.org")
+  (insert "\n")
+  (doom-dashboard-create-file-button "bitbucket" "ElispCode.org" "~/Dropbox/Code/Elisp.org")
+  (insert "\n"))
+
+(defun doom-dashboard-work-section ()
+  (insert-section-heading "Works" "orange")
+  (let ((list (dashboard-get-agenda "+/WORK" nil)))
+    (dolist (element list nil)
+      (create-todo-widget
+       element
+       (lambda (&rest ignore)
+         (find-file "~/Dropbox/org/task.org")))
+      )))
+
+(defun doom-dashboard-inprogress-section ()
+  (insert-section-heading "Processing" "orange")
+  (let ((list (dashboard-get-agenda "+/PROCESSING" nil)))
+    (dolist (element list nil)
+      (create-todo-widget
+       element
+       (lambda (&rest ignore)
+         (find-file "~/Dropbox/org/task.org")))
+      )))
+
+(defun doom-dashboard-widget-mymenu()
+  (doom-dashboard-files-section)
+  (doom-dashboard-inprogress-section)
+  (doom-dashboard-work-section)
+  (doom-dashboard-agenda-section)
+  (doom-dashboard-done-section)
+  )
+(setq +doom-dashboard-functions
+      '(doom-dashboard-widget-banner
+        doom-dashboard-widget-mymenu))
