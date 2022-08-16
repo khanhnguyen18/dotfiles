@@ -20,7 +20,7 @@
   (setq org-agenda-files
         '("~/Dropbox/org/task.org"))
   (setq org-todo-keywords
-      '((sequence "TODO(t)" "WORK(w)" "PROCESSING(p)" "|" "DONE(d)")))
+      '((sequence "TODO(t)" "WORK(w)" "HEALTH(h)" "PROCESSING(p)" "|" "DONE(d)")))
         )
 
 (setq org-todo-keyword-faces
@@ -28,6 +28,7 @@
     ("WORK" . "orange")
     ("PROCESSING"."yellow")
     ("DONE"."green")
+    ("HEALTH"."CYAN")
 ))
 
 (use-package! org-tempo
@@ -73,6 +74,15 @@
 
 (defun system-move-file-to-trash (file)
   (call-process (executable-find "trash") nil 0 nil file))
+
+(setq org-clock-sound "~/SOFT/bell.wav")
+(defun play-sound-internal (sound)
+  (sound-wav-play (nth 2 sound))
+  )
+;; (let ((file (expand-file-name "~/Downloads/bell.wav")))
+;;   (if (file-exists-p file)
+;;       (play-sound-file file)
+;;     ))
 
 (after! org-agenda
   (org-babel-load-file
