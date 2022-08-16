@@ -113,8 +113,7 @@
 
 
 **   Sections
-*** Agenda section
-**** Todo
+*** Tasks
 #+begin_src emacs-lisp
 (defun doom-dashboard-agenda-section ()
   (insert-section-heading "Tasks" "orange")
@@ -134,7 +133,7 @@
 
 #+RESULTS:
 : doom-dashboard-agenda-section
-**** Done by today
+*** Done by today
 #+begin_src emacs-lisp
 (defun done-today ()
   (let ((scheduled-time (substring (org-entry-get (point) "CLOSED") 1 11))
@@ -155,7 +154,6 @@
 
 #+RESULTS:
 : doom-dashboard-done-section
-
 
 
 
@@ -218,7 +216,7 @@
 #+RESULTS:
 : doom-dashboard-inprogress-section
 
-*** HEALTH
+*** Healths
 #+begin_src emacs-lisp
 (defun doom-dashboard-health-section ()
   (insert-section-heading "Health" "orange")
