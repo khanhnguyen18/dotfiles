@@ -1,54 +1,68 @@
 ;;; Autoload
 
-(defun +doom-dashboard--help-echo ()
+(defun +ndk-dashboard--help-echo ()
   (when-let* ((btn (button-at (point)))
               (msg (button-get btn 'help-echo)))
     (message "%s" msg)))
 
 ;;;###autoload
-(defun +doom-dashboard/open (frame)
+(defun +ndk-dashboard/open (frame)
   "Switch to the dashboard in the current window, of the current FRAME."
   (interactive (list (selected-frame)))
   (with-selected-frame frame
     (switch-to-buffer (doom-fallback-buffer))
-    (+doom-dashboard-reload t)))
+    (+ndk-dashboard-reload t)))
 
 
-;;; ui/doom-dashboard/config.el -*- lexical-binding: t; -*-
+;;;###autoload
+(defun +ndk-dashboard/forward-button (n)
+  "Like `forward-button', but don't wrap."
+  (interactive "p")
+  (forward-button n nil)
+  (+ndk-dashboard--help-echo))
 
-(defvar +doom-dashboard-name "*doom*"
+;;;###autoload
+(defun +ndk-dashboard/backward-button (n)
+  "Like `backward-button', but don't wrap."
+  (interactive "p")
+  (backward-button n nil)
+  (+ndk-dashboard--help-echo))
+
+;;; ui/ndk-dashboard/config.el -*- lexical-binding: t; -*-
+
+(defvar +ndk-dashboard-name "*doom*"
   "The name to use for the dashboard buffer.")
 
-(defvar +doom-dashboard-functions
-  '(doom-dashboard-widget-banner
-    doom-dashboard-widget-shortmenu
-    doom-dashboard-widget-loaded
-    doom-dashboard-widget-footer)
+(defvar +ndk-dashboard-functions
+  '(ndk-dashboard-widget-banner
+    ndk-dashboard-widget-shortmenu
+    ndk-dashboard-widget-loaded
+    ndk-dashboard-widget-footer)
   "List of widget functions to run in the dashboard buffer to construct the
 dashboard. These functions take no arguments and the dashboard buffer is current
 while they run.")
 
-(defvar +doom-dashboard-banner-file "default.png"
+(defvar +ndk-dashboard-banner-file "default.png"
   "The path to the image file to be used in on the dashboard. The path is
-relative to `+doom-dashboard-banner-dir'. If nil, always use the ASCII banner.")
+relative to `+ndk-dashboard-banner-dir'. If nil, always use the ASCII banner.")
 
-(defvar +doom-dashboard-banner-dir (concat (dir!) "/banners/")
-  "Where to look for `+doom-dashboard-banner-file'.")
+(defvar +ndk-dashboard-banner-dir (concat (dir!) "/banners/")
+  "Where to look for `+ndk-dashboard-banner-file'.")
 
-(defvar +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-banner-fn
+(defvar +ndk-dashboard-ascii-banner-fn #'ndk-dashboard-draw-ascii-banner-fn
   "The function used to generate the ASCII banner on Doom's dashboard.")
 
-(defvar +doom-dashboard-banner-padding '(0 . 4)
+(defvar +ndk-dashboard-banner-padding '(0 . 4)
   "Number of newlines to pad the banner with, above and below, respectively.")
 
-(defvar +doom-dashboard-inhibit-refresh nil
+(defvar +ndk-dashboard-inhibit-refresh nil
   "If non-nil, the doom buffer won't be refreshed.")
 
-(defvar +doom-dashboard-inhibit-functions ()
+(defvar +ndk-dashboard-inhibit-functions ()
   "A list of functions which take no arguments. If any of them return non-nil,
 dashboard reloading is inhibited.")
 
-(defvar +doom-dashboard-pwd-policy 'last-project
+(defvar +ndk-dashboard-pwd-policy 'last-project
   "The policy to use when setting the `default-directory' in the dashboard.
 
 Possible values:
@@ -61,36 +75,36 @@ Possible values:
   a STRING       A fixed path
   nil            `default-directory' will never change")
 
-(defvar +doom-dashboard-menu-sections
+(defvar +ndk-dashboard-menu-sections
   '(("Reload last session"
-     :icon (all-the-icons-octicon "history" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "history" :face 'ndk-dashboard-menu-title)
      :when (cond ((featurep! :ui workspaces)
                   (file-exists-p (expand-file-name persp-auto-save-fname persp-save-dir)))
                  ((require 'desktop nil t)
                   (file-exists-p (desktop-full-file-name))))
-     :face (:inherit (doom-dashboard-menu-title bold))
+     :face (:inherit (ndk-dashboard-menu-title bold))
      :action doom/quickload-session)
     ("Open org-agenda"
-     :icon (all-the-icons-octicon "calendar" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "calendar" :face 'ndk-dashboard-menu-title)
      :when (fboundp 'org-agenda)
      :action org-agenda)
     ("Recently opened files"
-     :icon (all-the-icons-octicon "file-text" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "file-text" :face 'ndk-dashboard-menu-title)
      :action recentf-open-files)
     ("Open project"
-     :icon (all-the-icons-octicon "briefcase" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "briefcase" :face 'ndk-dashboard-menu-title)
      :action projectile-switch-project)
     ("Jump to bookmark"
-     :icon (all-the-icons-octicon "bookmark" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "bookmark" :face 'ndk-dashboard-menu-title)
      :action bookmark-jump)
     ("Open private configuration"
-     :icon (all-the-icons-octicon "tools" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "tools" :face 'ndk-dashboard-menu-title)
      :when (file-directory-p doom-private-dir)
      :action doom/open-private-config)
     ("Open documentation"
-     :icon (all-the-icons-octicon "book" :face 'doom-dashboard-menu-title)
+     :icon (all-the-icons-octicon "book" :face 'ndk-dashboard-menu-title)
      :action doom/help))
-  "An alist of menu buttons used by `doom-dashboard-widget-shortmenu'. Each
+  "An alist of menu buttons used by `ndk-dashboard-widget-shortmenu'. Each
 element is a cons cell (LABEL . PLIST). LABEL is a string to display after the
 icon and before the key string.
 
@@ -108,11 +122,11 @@ PLIST can have the following properties:
     Run FORM when the button is pushed.")
 
 ;;
-(defvar +doom-dashboard--last-cwd nil)
-(defvar +doom-dashboard--width 80)
-(defvar +doom-dashboard--old-fringe-indicator fringe-indicator-alist)
-(defvar +doom-dashboard--pwd-alist ())
-(defvar +doom-dashboard--reload-timer nil)
+(defvar +ndk-dashboard--last-cwd nil)
+(defvar +ndk-dashboard--width 80)
+(defvar +ndk-dashboard--old-fringe-indicator fringe-indicator-alist)
+(defvar +ndk-dashboard--pwd-alist ())
+(defvar +ndk-dashboard--reload-timer nil)
 
 (defvar all-the-icons-scale-factor)
 (defvar all-the-icons-default-adjust)
@@ -121,73 +135,73 @@ PLIST can have the following properties:
 ;;
 ;;; Bootstrap
 
-(defun +doom-dashboard-init-h ()
+(defun +ndk-dashboard-init-h ()
   "Initializes Doom's dashboard."
   (unless noninteractive
     ;; Ensure the dashboard becomes Emacs' go-to buffer when there's nothing
     ;; else to show.
-    (setq doom-fallback-buffer-name +doom-dashboard-name
+    (setq doom-fallback-buffer-name +ndk-dashboard-name
           initial-buffer-choice #'doom-fallback-buffer)
     (unless fancy-splash-image
       (setq fancy-splash-image
-            (expand-file-name +doom-dashboard-banner-file
-                              +doom-dashboard-banner-dir)))
+            (expand-file-name +ndk-dashboard-banner-file
+                              +ndk-dashboard-banner-dir)))
     (when (equal (buffer-name) "*scratch*")
       (set-window-buffer nil (doom-fallback-buffer))
-      (+doom-dashboard-reload))
-    (add-hook 'doom-load-theme-hook #'+doom-dashboard-reload-on-theme-change-h)
+      (+ndk-dashboard-reload))
+    (add-hook 'doom-load-theme-hook #'+ndk-dashboard-reload-on-theme-change-h)
     ;; Ensure the dashboard is up-to-date whenever it is switched to or resized.
-    (add-hook 'window-configuration-change-hook #'+doom-dashboard-resize-h)
-    (add-hook 'window-size-change-functions #'+doom-dashboard-resize-h)
-    (add-hook 'doom-switch-buffer-hook #'+doom-dashboard-reload-maybe-h)
-    (add-hook 'delete-frame-functions #'+doom-dashboard-reload-frame-h)
+    (add-hook 'window-configuration-change-hook #'+ndk-dashboard-resize-h)
+    (add-hook 'window-size-change-functions #'+ndk-dashboard-resize-h)
+    (add-hook 'doom-switch-buffer-hook #'+ndk-dashboard-reload-maybe-h)
+    (add-hook 'delete-frame-functions #'+ndk-dashboard-reload-frame-h)
     ;; `persp-mode' integration: update `default-directory' when switching perspectives
-    (add-hook 'persp-created-functions #'+doom-dashboard--persp-record-project-h)
-    (add-hook 'persp-activated-functions #'+doom-dashboard--persp-detect-project-h)
+    (add-hook 'persp-created-functions #'+ndk-dashboard--persp-record-project-h)
+    (add-hook 'persp-activated-functions #'+ndk-dashboard--persp-detect-project-h)
     ;; HACK Fix #2219 where, in GUI daemon frames, the dashboard loses center
     ;;      alignment after switching (or killing) workspaces.
     (when (daemonp)
-      (add-hook 'persp-activated-functions #'+doom-dashboard-reload-maybe-h))
-    (add-hook 'persp-before-switch-functions #'+doom-dashboard--persp-record-project-h)))
+      (add-hook 'persp-activated-functions #'+ndk-dashboard-reload-maybe-h))
+    (add-hook 'persp-before-switch-functions #'+ndk-dashboard--persp-record-project-h)))
 
-(add-hook 'doom-init-ui-hook #'+doom-dashboard-init-h 'append)
+(add-hook 'doom-init-ui-hook #'+ndk-dashboard-init-h 'append)
 
 ;;
 ;;; Faces
-(defgroup doom-dashboard nil
-  "Manage how doom-dashboard is coloured and themed."
-  :prefix "doom-dashboard"
+(defgroup ndk-dashboard nil
+  "Manage how ndk-dashboard is coloured and themed."
+  :prefix "ndk-dashboard"
   :group 'doom-themes)
 
-(defface doom-dashboard-banner '((t (:inherit font-lock-comment-face)))
+(defface ndk-dashboard-banner '((t (:inherit font-lock-comment-face)))
   "Face used for the DOOM banner on the dashboard"
-  :group 'doom-dashboard)
+  :group 'ndk-dashboard)
 
-(defface doom-dashboard-footer '((t (:inherit font-lock-keyword-face)))
+(defface ndk-dashboard-footer '((t (:inherit font-lock-keyword-face)))
   "Face used for the footer on the dashboard"
-  :group 'doom-dashboard)
+  :group 'ndk-dashboard)
 
-(defface doom-dashboard-footer-icon '((t (:inherit all-the-icons-green)))
+(defface ndk-dashboard-footer-icon '((t (:inherit all-the-icons-green)))
   "Face used for the icon of the footer on the dashboard"
-  :group 'doom-dashboard)
+  :group 'ndk-dashboard)
 
-(defface doom-dashboard-loaded '((t (:inherit font-lock-comment-face)))
+(defface ndk-dashboard-loaded '((t (:inherit font-lock-comment-face)))
   "Face used for the loaded packages benchmark"
-  :group 'doom-dashboard)
+  :group 'ndk-dashboard)
 
-(defface doom-dashboard-menu-desc '((t (:inherit font-lock-constant-face)))
+(defface ndk-dashboard-menu-desc '((t (:inherit font-lock-constant-face)))
   "Face used for the key description of menu widgets on the dashboard"
-  :group 'doom-dashboard)
+  :group 'ndk-dashboard)
 
-(defface doom-dashboard-menu-title '((t (:inherit font-lock-keyword-face)))
+(defface ndk-dashboard-menu-title '((t (:inherit font-lock-keyword-face)))
   "Face used for the title of menu widgets on the dashboard"
-  :group 'doom-dashboard)
+  :group 'ndk-dashboard)
 
 
 ;;
 ;;; Major mode
 
-(define-derived-mode +doom-dashboard-mode special-mode
+(define-derived-mode +ndk-dashboard-mode special-mode
   (format "DOOM v%s" doom-version)
   "Major mode for the DOOM dashboard buffer."
   :syntax-table nil
@@ -207,15 +221,15 @@ PLIST can have the following properties:
            collect (cons car nil) into alist
            finally do (setq-local fringe-indicator-alist alist))
   ;; Ensure point is always on a button
-  (add-hook 'post-command-hook #'+doom-dashboard-reposition-point-h nil 'local)
+  (add-hook 'post-command-hook #'+ndk-dashboard-reposition-point-h nil 'local)
   ;; hl-line produces an ugly cut-off line highlight in the dashboard, so don't
   ;; activate it there (by pretending it's already active).
   (setq-local hl-line-mode t))
 
-(define-key! +doom-dashboard-mode-map
+(define-key! +ndk-dashboard-mode-map
   [left-margin mouse-1]   #'ignore
-  [remap forward-button]  #'+doom-dashboard/forward-button
-  [remap backward-button] #'+doom-dashboard/backward-button
+  [remap forward-button]  #'+ndk-dashboard/forward-button
+  [remap backward-button] #'+ndk-dashboard/backward-button
   "n"       #'forward-button
   "p"       #'backward-button
   "C-n"     #'forward-button
@@ -247,7 +261,7 @@ PLIST can have the following properties:
 ;;
 ;;; Hooks
 
-(defun +doom-dashboard-reposition-point-h ()
+(defun +ndk-dashboard-reposition-point-h ()
   "Trap the point in the buttons."
   (when (region-active-p)
     (setq deactivate-mark t)
@@ -261,7 +275,7 @@ PLIST can have the following properties:
         (goto-char (point-min))
         (forward-button 1))))
 
-(defun +doom-dashboard-reload-maybe-h (&rest _)
+(defun +ndk-dashboard-reload-maybe-h (&rest _)
   "Reload the dashboard or its state.
 
 If this isn't a dashboard buffer, move along, but record its `default-directory'
@@ -269,23 +283,23 @@ if the buffer is real. See `doom-real-buffer-p' for an explanation for what
 'real' means.
 
 If this is the dashboard buffer, reload it completely."
-  (cond ((+doom-dashboard-p (current-buffer))
-         (let (+doom-dashboard-inhibit-refresh)
-           (ignore-errors (+doom-dashboard-reload))))
+  (cond ((+ndk-dashboard-p (current-buffer))
+         (let (+ndk-dashboard-inhibit-refresh)
+           (ignore-errors (+ndk-dashboard-reload))))
         ((and (not (file-remote-p default-directory))
               (doom-real-buffer-p (current-buffer)))
-         (setq +doom-dashboard--last-cwd default-directory)
-         (+doom-dashboard-update-pwd-h))))
+         (setq +ndk-dashboard--last-cwd default-directory)
+         (+ndk-dashboard-update-pwd-h))))
 
-(defun +doom-dashboard-reload-frame-h (_frame)
+(defun +ndk-dashboard-reload-frame-h (_frame)
   "Reload the dashboard after a brief pause. This is necessary for new frames,
 whose dimensions may not be fully initialized by the time this is run."
-  (when (timerp +doom-dashboard--reload-timer)
-    (cancel-timer +doom-dashboard--reload-timer)) ; in case this function is run rapidly
-  (setq +doom-dashboard--reload-timer
-        (run-with-timer 0.1 nil #'+doom-dashboard-reload t)))
+  (when (timerp +ndk-dashboard--reload-timer)
+    (cancel-timer +ndk-dashboard--reload-timer)) ; in case this function is run rapidly
+  (setq +ndk-dashboard--reload-timer
+        (run-with-timer 0.1 nil #'+ndk-dashboard-reload t)))
 
-(defun +doom-dashboard-resize-h (&rest _)
+(defun +ndk-dashboard-resize-h (&rest _)
   "Recenter the dashboard, and reset its margins and fringes."
   (let (buffer-list-update-hook
         window-configuration-change-hook
@@ -295,7 +309,7 @@ whose dimensions may not be fully initialized by the time this is run."
         (set-window-start win 0)
         (set-window-fringes win 0 0)
         (set-window-margins
-         win (max 0 (/ (- (window-total-width win) +doom-dashboard--width) 2))))
+         win (max 0 (/ (- (window-total-width win) +ndk-dashboard--width) 2))))
       (with-current-buffer (doom-fallback-buffer)
         (save-excursion
           (with-silent-modifications
@@ -307,22 +321,22 @@ whose dimensions may not be fully initialized by the time this is run."
                      (+ (max 0 (- (/ (window-height (get-buffer-window)) 2)
                                   (round (/ (count-lines (point-min) (point-max))
                                             2))))
-                        (car +doom-dashboard-banner-padding))
+                        (car +ndk-dashboard-banner-padding))
                      ?\n))))))))
 
-(defun +doom-dashboard--persp-detect-project-h (&rest _)
+(defun +ndk-dashboard--persp-detect-project-h (&rest _)
   "Set dashboard's PWD to current persp's `last-project-root', if it exists.
 
-This and `+doom-dashboard--persp-record-project-h' provides `persp-mode'
+This and `+ndk-dashboard--persp-record-project-h' provides `persp-mode'
 integration with the Doom dashboard. It ensures that the dashboard is always in
 the correct project (which may be different across perspective)."
   (when (bound-and-true-p persp-mode)
     (when-let (pwd (persp-parameter 'last-project-root))
-      (+doom-dashboard-update-pwd-h pwd))))
+      (+ndk-dashboard-update-pwd-h pwd))))
 
-(defun +doom-dashboard--persp-record-project-h (&optional persp &rest _)
+(defun +ndk-dashboard--persp-record-project-h (&optional persp &rest _)
   "Record the last `doom-project-root' for the current persp.
-See `+doom-dashboard--persp-detect-project-h' for more information."
+See `+ndk-dashboard--persp-detect-project-h' for more information."
   (when (bound-and-true-p persp-mode)
     (set-persp-parameter
      'last-project-root (doom-project-root)
@@ -334,58 +348,58 @@ See `+doom-dashboard--persp-detect-project-h' for more information."
 ;;
 ;;; Library
 
-(defun +doom-dashboard-p (buffer)
+(defun +ndk-dashboard-p (buffer)
   "Returns t if BUFFER is the dashboard buffer."
-  (eq buffer (get-buffer +doom-dashboard-name)))
+  (eq buffer (get-buffer +ndk-dashboard-name)))
 
-(defun +doom-dashboard-update-pwd-h (&optional pwd)
+(defun +ndk-dashboard-update-pwd-h (&optional pwd)
   "Update `default-directory' in the Doom dashboard buffer.
-What it is set to is controlled by `+doom-dashboard-pwd-policy'."
+What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
   (if pwd
       (with-current-buffer (doom-fallback-buffer)
         (doom-log "Changed dashboard's PWD to %s" pwd)
         (setq-local default-directory pwd))
-    (let ((new-pwd (+doom-dashboard--get-pwd)))
+    (let ((new-pwd (+ndk-dashboard--get-pwd)))
       (when (and new-pwd (file-accessible-directory-p new-pwd))
-        (+doom-dashboard-update-pwd-h
+        (+ndk-dashboard-update-pwd-h
          (concat (directory-file-name new-pwd)
                  "/"))))))
 
-(defun +doom-dashboard-reload-on-theme-change-h ()
+(defun +ndk-dashboard-reload-on-theme-change-h ()
   "Forcibly reload the Doom dashboard when theme changes post-startup."
   (when after-init-time
-    (+doom-dashboard-reload 'force)))
+    (+ndk-dashboard-reload 'force)))
 
-(defun +doom-dashboard-reload (&optional force)
+(defun +ndk-dashboard-reload (&optional force)
   "Update the DOOM scratch buffer (or create it, if it doesn't exist)."
-  (when (or (and (not +doom-dashboard-inhibit-refresh)
+  (when (or (and (not +ndk-dashboard-inhibit-refresh)
                  (get-buffer-window (doom-fallback-buffer))
                  (not (window-minibuffer-p (frame-selected-window)))
-                 (not (run-hook-with-args-until-success '+doom-dashboard-inhibit-functions)))
+                 (not (run-hook-with-args-until-success '+ndk-dashboard-inhibit-functions)))
             force)
     (with-current-buffer (doom-fallback-buffer)
       (doom-log "Reloading dashboard at %s" (format-time-string "%T"))
       (with-silent-modifications
         (let ((pt (point)))
-          (unless (eq major-mode '+doom-dashboard-mode)
-            (+doom-dashboard-mode))
+          (unless (eq major-mode '+ndk-dashboard-mode)
+            (+ndk-dashboard-mode))
           (erase-buffer)
-          (run-hooks '+doom-dashboard-functions)
+          (run-hooks '+ndk-dashboard-functions)
           (goto-char pt)
-          (+doom-dashboard-reposition-point-h))
-        (+doom-dashboard-resize-h)
-        (+doom-dashboard--persp-detect-project-h)
-        (+doom-dashboard-update-pwd-h)
+          (+ndk-dashboard-reposition-point-h))
+        (+ndk-dashboard-resize-h)
+        (+ndk-dashboard--persp-detect-project-h)
+        (+ndk-dashboard-update-pwd-h)
         (current-buffer)))))
 
 ;; helpers
-(defun +doom-dashboard--center (len s)
+(defun +ndk-dashboard--center (len s)
   (concat (make-string (ceiling (max 0 (- len (length s))) 2) ? )
           s))
 
-(defun +doom-dashboard--get-pwd ()
-  (let ((lastcwd +doom-dashboard--last-cwd)
-        (policy +doom-dashboard-pwd-policy))
+(defun +ndk-dashboard--get-pwd ()
+  (let ((lastcwd +ndk-dashboard--last-cwd)
+        (policy +ndk-dashboard-pwd-policy))
     (cond ((null policy)
            default-directory)
           ((stringp policy)
@@ -399,14 +413,14 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
                lastcwd))
           ((eq policy 'last)
            lastcwd)
-          ((warn "`+doom-dashboard-pwd-policy' has an invalid value of '%s'"
+          ((warn "`+ndk-dashboard-pwd-policy' has an invalid value of '%s'"
                  policy)))))
 
 
 ;;
 ;;; Widgets
 
-(defun doom-dashboard-draw-ascii-banner-fn ()
+(defun ndk-dashboard-draw-ascii-banner-fn ()
   (let* ((banner
           '("=================     ===============     ===============   ========  ========"
             "\\\\ . . . . . . .\\\\   //. . . . . . .\\\\   //. . . . . . .\\\\  \\\\. . .\\\\// . . //"
@@ -431,18 +445,18 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
     (put-text-property
      (point)
      (dolist (line banner (point))
-       (insert (+doom-dashboard--center
-                +doom-dashboard--width
+       (insert (+ndk-dashboard--center
+                +ndk-dashboard--width
                 (concat
                  line (make-string (max 0 (- longest-line (length line)))
                                    32)))
                "\n"))
-     'face 'doom-dashboard-banner)))
+     'face 'ndk-dashboard-banner)))
 
-(defun doom-dashboard-widget-banner ()
+(defun ndk-dashboard-widget-banner ()
   (let ((point (point)))
-    (when (functionp +doom-dashboard-ascii-banner-fn)
-      (funcall +doom-dashboard-ascii-banner-fn))
+    (when (functionp +ndk-dashboard-ascii-banner-fn)
+      (funcall +ndk-dashboard-ascii-banner-fn))
     (when (and (display-graphic-p)
                (stringp fancy-splash-image)
                (file-readable-p fancy-splash-image))
@@ -453,35 +467,35 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
           (goto-char point)
           (insert (make-string
                    (truncate
-                    (max 0 (+ 1 (/ (- +doom-dashboard--width
+                    (max 0 (+ 1 (/ (- +ndk-dashboard--width
                                       (car (image-size image nil)))
                                    2))))
                    ? ))))
-      (insert (make-string (or (cdr +doom-dashboard-banner-padding) 0)
+      (insert (make-string (or (cdr +ndk-dashboard-banner-padding) 0)
                            ?\n)))))
 
-(defun doom-dashboard-widget-loaded ()
+(defun ndk-dashboard-widget-loaded ()
   (insert
    "\n\n"
    (propertize
-    (+doom-dashboard--center
-     +doom-dashboard--width
+    (+ndk-dashboard--center
+     +ndk-dashboard--width
      (doom-display-benchmark-h 'return))
-    'face 'doom-dashboard-loaded)
+    'face 'ndk-dashboard-loaded)
    "\n"))
 
-(defun doom-dashboard-widget-shortmenu ()
+(defun ndk-dashboard-widget-shortmenu ()
   (let ((all-the-icons-scale-factor 1.45)
         (all-the-icons-default-adjust -0.02))
     (insert "\n")
-    (dolist (section +doom-dashboard-menu-sections)
+    (dolist (section +ndk-dashboard-menu-sections)
       (cl-destructuring-bind (label &key icon action when face key) section
         (when (and (fboundp action)
                    (or (null when)
                        (eval when t)))
           (insert
-           (+doom-dashboard--center
-            (- +doom-dashboard--width 1)
+           (+ndk-dashboard--center
+            (- +ndk-dashboard--width 1)
             (let ((icon (if (stringp icon) icon (eval icon t))))
               (format (format "%s%%s%%-10s" (if icon "%3s\t" "%3s"))
                       (or icon "")
@@ -492,11 +506,11 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
                          `(lambda (_)
                             (call-interactively (or (command-remapping #',action)
                                                     #',action)))
-                         'face (or face 'doom-dashboard-menu-title)
+                         'face (or face 'ndk-dashboard-menu-title)
                          'follow-link t
                          'help-echo
                          (format "%s (%s)" label
-                                 (propertize (symbol-name action) 'face 'doom-dashboard-menu-desc)))
+                                 (propertize (symbol-name action) 'face 'ndk-dashboard-menu-desc)))
                         (format "%-37s" (buffer-string)))
                       ;; Lookup command keys dynamically
                       (propertize
@@ -505,8 +519,8 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
                                ((keymaps
                                  (delq
                                   nil (list (when (bound-and-true-p evil-local-mode)
-                                              (evil-get-auxiliary-keymap +doom-dashboard-mode-map 'normal))
-                                            +doom-dashboard-mode-map)))
+                                              (evil-get-auxiliary-keymap +ndk-dashboard-mode-map 'normal))
+                                            +ndk-dashboard-mode-map)))
                                 (key
                                  (or (when keymaps
                                        (where-is-internal action keymaps t))
@@ -521,19 +535,19 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
                                               (substring str 0 3))))))
                                (buffer-string)))
                            "")
-                       'face 'doom-dashboard-menu-desc))))
+                       'face 'ndk-dashboard-menu-desc))))
            (if (display-graphic-p)
                "\n\n"
              "\n")))))))
 
-(defun doom-dashboard-widget-footer ()
+(defun ndk-dashboard-widget-footer ()
   (insert
    "\n"
-   (+doom-dashboard--center
-    (- +doom-dashboard--width 2)
+   (+ndk-dashboard--center
+    (- +ndk-dashboard--width 2)
     (with-temp-buffer
-      (insert-text-button (or (all-the-icons-octicon "octoface" :face 'doom-dashboard-footer-icon :height 1.3 :v-adjust -0.15)
-                              (propertize "github" 'face 'doom-dashboard-footer))
+      (insert-text-button (or (all-the-icons-octicon "octoface" :face 'ndk-dashboard-footer-icon :height 1.3 :v-adjust -0.15)
+                              (propertize "github" 'face 'ndk-dashboard-footer))
                           'action (lambda (_) (browse-url "https://github.com/hlissner/doom-emacs"))
                           'follow-link t
                           'help-echo "Open Doom Emacs github page")
@@ -628,7 +642,7 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
   (insert "\n")
   )
 
-(defun doom-dashboard-agenda-section ()
+(defun ndk-dashboard-agenda-section ()
   (insert-section-heading "Tasks" "orange")
   (let ((list (dashboard-get-agenda "/+TODO" nil)))
     (dolist (element
@@ -651,54 +665,54 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
       (point))
     )
   )
-(defun doom-dashboard-done-section ()
+(defun ndk-dashboard-done-section ()
   (insert-section-heading "Done By Today" "green")
   (let ((list (dashboard-get-agenda "/+DONE" 'done-today)))
     (dolist (element list )
       (create-todo-widget element))))
 
-(defun doom-dashboard-create-file-button (icon text link)
+(defun ndk-dashboard-create-file-button (icon text link)
   (insert
    (with-temp-buffer
      (insert-text-button (format "%3s\t%s"
-                                 (all-the-icons-faicon icon :face 'doom-dashboard-menu-title :v-adjust 0.01)
+                                 (all-the-icons-faicon icon :face 'ndk-dashboard-menu-title :v-adjust 0.01)
                                  text)
                          'action
                          `(lambda (_) (find-file ,link))
                          'follow-link t
-                         'face 'doom-dashboard-menu-title
+                         'face 'ndk-dashboard-menu-title
                          'help-echo (format "Open %s" text))
      (format "%-79s" (buffer-string)))))
-(defun doom-dashboard-files-section ()
+(defun ndk-dashboard-files-section ()
   (insert-section-heading "Files" "orange")
 
-  (doom-dashboard-create-file-button "calendar-check-o" "Task.org" "~/Dropbox/org/Task.org")
+  (ndk-dashboard-create-file-button "calendar-check-o" "Task.org" "~/Dropbox/org/Task.org")
   (insert "\n")
-  (doom-dashboard-create-file-button "pie-chart" "Work.org" "~/Dropbox/work/daily/work.org")
+  (ndk-dashboard-create-file-button "pie-chart" "Work.org" "~/Dropbox/work/daily/work.org")
   (insert "\n")
-  (doom-dashboard-create-file-button "laptop" "Doom Config.org" "~/.doom.d/doom-config.org")
+  (ndk-dashboard-create-file-button "laptop" "Doom Config.org" "~/.doom.d/doom-config.org")
   (insert "\n")
-  (doom-dashboard-create-file-button "database" "Dashboard.org" "~/.doom.d/dashboard.org")
+  (ndk-dashboard-create-file-button "database" "Dashboard.org" "~/.doom.d/dashboard.org")
   (insert "\n")
-  (doom-dashboard-create-file-button "bicycle" "Running.org" "~/Dropbox/running/Running.org")
+  (ndk-dashboard-create-file-button "bicycle" "Running.org" "~/Dropbox/running/Running.org")
   (insert "\n")
-  (doom-dashboard-create-file-button "bitbucket" "Elisp Code.org" "~/Dropbox/Code/Elisp.org")
+  (ndk-dashboard-create-file-button "bitbucket" "Elisp Code.org" "~/Dropbox/Code/Elisp.org")
   (insert "\n"))
 
-(defun doom-dashboard-work-section ()
+(defun ndk-dashboard-work-section ()
   (insert-section-heading "Works" "orange")
   (let ((list (dashboard-get-agenda "+/WORK" nil)))
     (dolist (element list nil)
       (create-todo-widget element))))
 
-(defun doom-dashboard-inprogress-section ()
+(defun ndk-dashboard-inprogress-section ()
   (insert-section-heading "Processing" "orange")
   (let ((list (dashboard-get-agenda "+/PROCESSING" nil)))
     (dolist (element list nil)
       (create-todo-widget element)
       )))
 
-(defun doom-dashboard-health-section ()
+(defun ndk-dashboard-health-section ()
   (insert-section-heading "Health" "orange")
   (let ((list (dashboard-get-agenda "+/HEALTH" nil)))
     (dolist (element list nil)
@@ -708,17 +722,17 @@ What it is set to is controlled by `+doom-dashboard-pwd-policy'."
   )
 
 (set-face-attribute 'button nil :inherit nil)
-(defun doom-dashboard-widget-mymenu()
-  (doom-dashboard-files-section)
-  (doom-dashboard-inprogress-section)
-  (doom-dashboard-work-section)
-  (doom-dashboard-agenda-section)
-  (doom-dashboard-health-section)
-  (doom-dashboard-done-section)
+(defun ndk-dashboard-widget-mymenu()
+  (ndk-dashboard-files-section)
+  (ndk-dashboard-inprogress-section)
+  (ndk-dashboard-work-section)
+  (ndk-dashboard-agenda-section)
+  (ndk-dashboard-health-section)
+  (ndk-dashboard-done-section)
   )
-(setq +doom-dashboard-functions
-      '(doom-dashboard-widget-banner
-        doom-dashboard-widget-mymenu))
+(setq +ndk-dashboard-functions
+      '(ndk-dashboard-widget-banner
+        ndk-dashboard-widget-mymenu))
 
-(map! "<f2>" (lambda() (interactive) (+doom-dashboard/open (selected-frame))))
-(+doom-dashboard/open (selected-frame))
+(map! "<f2>" (lambda() (interactive) (+ndk-dashboard/open (selected-frame))))
+(+ndk-dashboard/open (selected-frame))
