@@ -35,7 +35,6 @@
   :config
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 
-(map! "<f2>" (lambda() (interactive) (+doom-dashboard/open (selected-frame))))
 (map! "<f5>" (lambda() (interactive) (org-babel-execute-src-block)))
 (map! "<f4>" (lambda() (interactive) (org-indent-block)))
 (map! "<f3>" (lambda() (interactive) (switch-to-buffer nil)))

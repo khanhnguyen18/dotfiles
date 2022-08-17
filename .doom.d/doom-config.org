@@ -51,7 +51,6 @@ Setup face for org mode
 
 ** F5 to open dashboard
 #+begin_src emacs-lisp :results silent
-(map! "<f2>" (lambda() (interactive) (+doom-dashboard/open (selected-frame))))
 (map! "<f5>" (lambda() (interactive) (org-babel-execute-src-block)))
 (map! "<f4>" (lambda() (interactive) (org-indent-block)))
 (map! "<f3>" (lambda() (interactive) (switch-to-buffer nil)))
