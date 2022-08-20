@@ -824,7 +824,7 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
               (setq list-time (concat list-time " " (format-time-string "%H:%M" date))))
             )
           (setq closed-dates (cdr closed-dates)))
-        (widget-create 'item :tag (propertize (format "(%d times)%s" count list-time) 'face '(:foreground "green") ))
+        (widget-create 'item :tag (propertize (format "%18s(%d times)%s" "" count list-time) 'face '(:foreground "green") ))
 
         )
       )

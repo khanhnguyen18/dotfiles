@@ -35,6 +35,7 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
+  (setq org-modules (cons 'org-habit org-modules))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;

@@ -555,17 +555,32 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
      "\n"))
   )
 
+(declare-function org-habit-build-graph "org-habit" (habit starting current ending))
+(declare-function org-is-habit-p "org-habit" (&optional pom))
+
+
 (defun dashboard-agenda--formatted-headline ()
   "Set agenda faces to `HEADLINE' when face text property is nil."
   (let* ((headline (org-get-heading t t t t))
          (todo (or (org-get-todo-state) ""))
          (org-level-face (nth (- (org-outline-level) 1) org-level-faces))
+         (moment (time-subtract nil (* 3600 org-extend-today-until)))
          (todo-state (format org-agenda-todo-keyword-format todo)))
     (when (null (get-text-property 0 'face headline))
       (add-face-text-property 0 (length headline) org-level-face t headline))
     (when (null (get-text-property 0 'face todo-state))
       (add-face-text-property 0 (length todo-state) (org-get-todo-face todo) t todo-state))
-    (concat todo-state " " headline)))
+    (if (org-is-habit-p (point))
+        (concat todo-state " " headline " "
+                (org-habit-build-graph
+                 (org-habit-parse-todo)
+                 (time-subtract moment (days-to-time org-habit-preceding-days))
+                 moment
+                 (time-add moment (days-to-time org-habit-following-days))
+                 )
+                )
+      (concat todo-state " " headline))
+    ))
 
 (defun dashboard-agenda--formatted-time ()
   "Get the scheduled or dead time of an entry.  If no time is found return nil."
@@ -731,7 +746,7 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
               (setq list-time (concat list-time " " (format-time-string "%H:%M" date))))
             )
           (setq closed-dates (cdr closed-dates)))
-        (widget-create 'item :tag (propertize (format "(%d)%s" count list-time) 'face '(:foreground "green") ))
+        (widget-create 'item :tag (propertize (format "%18s(%d times)%s" "" count list-time) 'face '(:foreground "green") ))
 
         )
       )
