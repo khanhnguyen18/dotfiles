@@ -26,7 +26,7 @@ Setup face for org mode
   (setq org-agenda-files
         '("~/Dropbox/org/task.org"))
   (setq org-todo-keywords
-      '((sequence "TODO(t)" "WORK(w)" "HEALTH(h)" "PROCESSING(p)" "|" "DONE(d)")))
+      '((sequence "TODO(t)" "WORK(w)" "HEALTH(h)" "HABIT" "PROCESSING(p)" "|" "DONE(d)")))
         )
 
 (setq org-todo-keyword-faces
@@ -35,6 +35,7 @@ Setup face for org mode
     ("PROCESSING"."yellow")
     ("DONE"."green")
     ("HEALTH"."CYAN")
+    ("HABIT"."BLUE")
 ))
 #+end_src
 
@@ -98,6 +99,13 @@ This is a tools for managing the notes and daily journal
 
 #+RESULTS:
 : #<buffer doom-config.org>
+
+
+* ORG HABIT
+
+#+begin_src emacs-lisp
+(setq org-habit-show-all-today t)
+#+end_src
 
 * TWEAK UI
 ** Fix issue for metakey only on Doom Emacs

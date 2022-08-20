@@ -422,14 +422,14 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
 
 (defun ndk-dashboard-draw-ascii-banner-fn ()
   (let* ((banner
-          '("              .===' `===.         .==='.`===.         .===' /==.               "
-            "           .=='   \\_|-_ `===. .==='   _|_   `===. .===' _-|/   .==            "
-            "        .=='    _-'    `-_  `='    _-'   `-_    `='  _-'   '-_     .==         "
-            "     .=='    _-'          '-__\\._-'         '-_./__-'        '-_    .==       "
-            "  .=='    _-'                                                    '-_    .==    "
-            "=='    _-'                         E M A C S                       '-_     .== "
-            "\\   _-'                                                             '-_    \\ "
-            " `''                                                                     ''`   "))
+          '("              .===' `===.          .==='.'===.          .===` '===.              "
+            "           .=='   \\_|-_ `===. .==='   _|_   '===. .===` _-|_//   '==.           "
+            "        .=='    _-'    `-_  `='    _-'   `-_    `='  _-'      '-_    '==.        "
+            "     .=='    _-'          '-__\\._-'         '-_./__-'           '-_    '==.     "
+            "  .=='    _-'                                                       '-_    '==.  "
+            "=='    _-'                         E M A C S                           '-_    '=="
+            "\\   _-'                                                                 '-_   \\"
+            " `''                                                                         ''` "))
          (longest-line (apply #'max (mapcar #'length banner))))
     (put-text-property
      (point)
@@ -586,9 +586,12 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
          (todo-state (org-get-todo-state))
          (todo-index (and todo-state
                           (length (member todo-state org-todo-keywords-1))))
+         (is-habit (ndk-dashboard-org-is-habit-p))
+         (closed-dates (and is-habit (ndk-dashboard-org-habit-get-closed-dates (point))))
          (entry-data (list 'dashboard-agenda-time entry-time
                            'dashboard-agenda-todo-index todo-index
                            'dashboard-agenda-file (buffer-file-name)
+                           'closed-dates closed-dates
                            'dashboard-agenda-loc (point))))
     (add-text-properties 0 (length item) entry-data item)
     item))
@@ -710,12 +713,38 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
     )
   )
 
+(org-babel-load-file
+ (expand-file-name "/Users/khanh/Dropbox/Code/OrgHabit.org"))
+
+(defun ndk-dashboard-habitance-section ()
+  (insert-section-heading "Habitance" "orange")
+  (let ((list (dashboard-get-agenda "+/HABIT" nil)))
+    (dolist (element list nil)
+      (create-todo-widget element)
+      (let* ((list-time "")
+             (count 0)
+             (closed-dates (get-text-property 0 'closed-dates element)))
+        (while closed-dates
+          (let ((date (car closed-dates)))
+            (when (string= (format-time-string "%Y-%m-%d" date) (format-time-string "%Y-%m-%d"))
+              (setq count (+ count 1))
+              (setq list-time (concat list-time " " (format-time-string "%H:%M" date))))
+            )
+          (setq closed-dates (cdr closed-dates)))
+        (widget-create 'item :tag (propertize (format "(%d)%s" count list-time) 'face '(:foreground "green") ))
+
+        )
+      )
+    )
+  )
+
 (set-face-attribute 'button nil :inherit nil)
 (defun ndk-dashboard-widget-mymenu()
   (ndk-dashboard-files-section)
   (ndk-dashboard-inprogress-section)
   (ndk-dashboard-work-section)
   (ndk-dashboard-agenda-section)
+  (ndk-dashboard-habitance-section)
   (ndk-dashboard-health-section)
   (ndk-dashboard-done-section)
   )

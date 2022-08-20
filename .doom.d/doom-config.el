@@ -20,7 +20,7 @@
   (setq org-agenda-files
         '("~/Dropbox/org/task.org"))
   (setq org-todo-keywords
-      '((sequence "TODO(t)" "WORK(w)" "HEALTH(h)" "PROCESSING(p)" "|" "DONE(d)")))
+      '((sequence "TODO(t)" "WORK(w)" "HEALTH(h)" "HABIT" "PROCESSING(p)" "|" "DONE(d)")))
         )
 
 (setq org-todo-keyword-faces
@@ -29,6 +29,7 @@
     ("PROCESSING"."yellow")
     ("DONE"."green")
     ("HEALTH"."CYAN")
+    ("HABIT"."BLUE")
 ))
 
 (use-package! org-tempo
@@ -66,6 +67,8 @@
 (setq org-latex-to-pdf-process
   '("xelatex -interaction nonstopmode %f"
      "xelatex -interaction nonstopmode %f"))
+
+(setq org-habit-show-all-today t)
 
 (setq mac-right-option-modifier 'meta)
 
