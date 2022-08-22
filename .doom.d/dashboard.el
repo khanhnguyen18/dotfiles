@@ -29,7 +29,6 @@
   (+ndk-dashboard--help-echo))
 
 ;;; ui/ndk-dashboard/config.el -*- lexical-binding: t; -*-
-
 (defvar +ndk-dashboard-name "*doom*"
   "The name to use for the dashboard buffer.")
 
@@ -736,19 +735,23 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
   (let ((list (dashboard-get-agenda "+/HABIT" nil)))
     (dolist (element list nil)
       (create-todo-widget element)
+
       (let* ((list-time "")
              (count 0)
              (closed-dates (get-text-property 0 'closed-dates element)))
-        (while closed-dates
-          (let ((date (car closed-dates)))
-            (when (string= (format-time-string "%Y-%m-%d" date) (format-time-string "%Y-%m-%d"))
-              (setq count (+ count 1))
-              (setq list-time (concat list-time " " (format-time-string "%H:%M" date))))
-            )
-          (setq closed-dates (cdr closed-dates)))
-        (widget-create 'item :tag (propertize (format "%18s(%d times)%s" "" count list-time) 'face '(:foreground "green") ))
+        (when closed-dates
 
+          (while closed-dates
+            (let ((date (car closed-dates)))
+              (when (string= (format-time-string "%Y-%m-%d" date) (format-time-string "%Y-%m-%d"))
+                (setq count (+ count 1))
+                (setq list-time (concat list-time " " (format-time-string "%H:%M" date))))
+              )
+            (setq closed-dates (cdr closed-dates)))
+          (widget-create 'item :tag (propertize (format "%18s(%d times)%s" "" count list-time) 'face '(:foreground "green") ))
+          )
         )
+
       )
     )
   )

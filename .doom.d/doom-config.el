@@ -1,5 +1,5 @@
 (defun dk/org-mode-setup()
-  (text-scale-set 2)
+  ;; (text-scale-set 2)
   ;(set-face-attribute 'default nil :font "Source Code Pro for Powerline" :weight 'medium :height 200);"Menlo"
   ;(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 200)
   ;(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -29,7 +29,7 @@
     ("PROCESSING"."yellow")
     ("DONE"."green")
     ("HEALTH"."CYAN")
-    ("HABIT"."BLUE")
+    ("HABIT"."MAGENTA")
 ))
 
 (use-package! org-tempo
