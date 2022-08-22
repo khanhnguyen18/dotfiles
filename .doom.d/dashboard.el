@@ -563,23 +563,12 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
   (let* ((headline (org-get-heading t t t t))
          (todo (or (org-get-todo-state) ""))
          (org-level-face (nth (- (org-outline-level) 1) org-level-faces))
-         (moment (time-subtract nil (* 3600 org-extend-today-until)))
          (todo-state (format org-agenda-todo-keyword-format todo)))
     (when (null (get-text-property 0 'face headline))
       (add-face-text-property 0 (length headline) org-level-face t headline))
     (when (null (get-text-property 0 'face todo-state))
       (add-face-text-property 0 (length todo-state) (org-get-todo-face todo) t todo-state))
-    (if (org-is-habit-p (point))
-        (concat todo-state " " headline " "
-                (org-habit-build-graph
-                 (org-habit-parse-todo)
-                 (time-subtract moment (days-to-time org-habit-preceding-days))
-                 moment
-                 (time-add moment (days-to-time org-habit-following-days))
-                 )
-                )
-      (concat todo-state " " headline))
-    ))
+    (concat todo-state " " headline)))
 
 (defun dashboard-agenda--formatted-time ()
   "Get the scheduled or dead time of an entry.  If no time is found return nil."
@@ -601,11 +590,15 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
          (todo-index (and todo-state
                           (length (member todo-state org-todo-keywords-1))))
          (is-habit (ndk-dashboard-org-is-habit-p))
+         (habit-parse-todo-obj (and is-habit
+                                    (org-habit-parse-todo)
+                                    ))
          (closed-dates (and is-habit (ndk-dashboard-org-habit-get-closed-dates (point))))
          (entry-data (list 'dashboard-agenda-time entry-time
                            'dashboard-agenda-todo-index todo-index
                            'dashboard-agenda-file (buffer-file-name)
                            'closed-dates closed-dates
+                           'habit-parse-todo-obj habit-parse-todo-obj
                            'dashboard-agenda-loc (point))))
     (add-text-properties 0 (length item) entry-data item)
     item))
@@ -738,6 +731,8 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
 
       (let* ((list-time "")
              (count 0)
+             (todo-obj (get-text-property 0 'habit-parse-todo-obj element))
+             (moment (time-subtract nil (* 3600 org-extend-today-until)))
              (closed-dates (get-text-property 0 'closed-dates element)))
         (when closed-dates
 
@@ -748,7 +743,16 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
                 (setq list-time (concat list-time " " (format-time-string "%H:%M" date))))
               )
             (setq closed-dates (cdr closed-dates)))
-          (widget-create 'item :tag (propertize (format "%18s(%d times)%s" "" count list-time) 'face '(:foreground "green") ))
+          (widget-create 'item
+                         :tag (concat
+                               (propertize (format "%18s(%d times)%s" "" count list-time) 'face '(:foreground "green"))
+                               (org-habit-build-graph
+                                todo-obj
+                                (time-subtract moment (days-to-time org-habit-preceding-days))
+                                moment
+                                (time-add moment (days-to-time org-habit-following-days)))
+                               )
+                         )
           )
         )
 
