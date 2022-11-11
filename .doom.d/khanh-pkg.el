@@ -6,3 +6,5 @@
 
 ;(package! dashboard)
 ;(package! page-break-lines)
+
+(package! undo-tree)

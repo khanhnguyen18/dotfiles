@@ -31,3 +31,4 @@ export PATH="/usr/local/opt/php@7.2/bin:$PATH"
 alias python='python3'
 
 export PATH="$PATH:/Library/TeX/texbin"
+export PATH="/usr/local/opt/node@12/bin:$PATH"

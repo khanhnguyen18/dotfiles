@@ -1,0 +1,23 @@
+#+title: Ndk Tools
+* Copy string to clipboard
+#+begin_src emacs-lisp
+(defun ndk-copy-to-clipboard (str)
+  (with-temp-buffer
+    (insert str)
+    (clipboard-kill-region (point-min) (point-max)))
+  )
+#+end_src
+
+#+RESULTS:
+: ndk-copy-to-clipboard
+
+* Generate date "YYYY-mm-dd"
+#+begin_src emacs-lisp
+(defun ndk-tools-generate-date ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d"))
+  )
+#+end_src
+
+#+RESULTS:
+: ndk-tools-generate-date

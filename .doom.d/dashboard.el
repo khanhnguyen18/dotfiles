@@ -685,6 +685,9 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
 (defun ndk-dashboard-files-section ()
   (insert-section-heading "Files" "orange")
 
+  (ndk-dashboard-create-file-button "calendar-check-o" "Common.org" "~/Dropbox/org/common.org")
+  (insert "\n")
+
   (ndk-dashboard-create-file-button "calendar-check-o" "Task.org" "~/Dropbox/org/Task.org")
   (insert "\n")
   (ndk-dashboard-create-file-button "pie-chart" "Work.org" "~/Dropbox/work/daily/work.org")
@@ -696,6 +699,8 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
   (ndk-dashboard-create-file-button "bicycle" "Running.org" "~/Dropbox/running/Running.org")
   (insert "\n")
   (ndk-dashboard-create-file-button "bitbucket" "Elisp Code.org" "~/Dropbox/Code/Elisp.org")
+  (insert "\n")
+  (ndk-dashboard-create-file-button "bitbucket" "Themes.org" "~/Dropbox/Code/Themes.org")
   (insert "\n"))
 
 (defun ndk-dashboard-work-section ()
