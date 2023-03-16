@@ -205,8 +205,8 @@ Fix the feature trash. Still have problem with Put Back Feature
 : Loaded /Users/khanh/.doom.d/dashboard.el
 * TOOLS
 #+begin_src emacs-lisp :results none
-  (org-babel-load-file
-   (expand-file-name "~/.doom.d/ndk-tools.org"))
+;  (org-babel-load-file
+;   (expand-file-name "~/.doom.d/ndk-tools.org"))
 #+end_src
 * UNDO tree
 #+begin_src emacs-lisp :tangle khanh-pkg.el

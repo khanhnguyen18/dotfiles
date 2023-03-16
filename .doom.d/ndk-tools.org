@@ -21,3 +21,14 @@
 
 #+RESULTS:
 : ndk-tools-generate-date
+* Collect done
+#+begin_src emacs-lisp :results none
+(org-babel-load-file
+ (expand-file-name "/Users/khanh/Dropbox/Code/collect-done-task.org"))
+(defun collect-all-done-task ()
+  (interactive)
+  (collect-done-task " HEALTHS TODOS WORKS " "COMPLETE")
+  )
+
+#+end_src
+

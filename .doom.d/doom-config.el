@@ -110,5 +110,5 @@
    (expand-file-name "dashboard.org" "~/.doom.d"))
 )
 
-  (org-babel-load-file
-   (expand-file-name "~/.doom.d/ndk-tools.org"))
+;  (org-babel-load-file
+;   (expand-file-name "~/.doom.d/ndk-tools.org"))

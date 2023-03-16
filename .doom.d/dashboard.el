@@ -701,6 +701,8 @@ What it is set to is controlled by `+ndk-dashboard-pwd-policy'."
   (ndk-dashboard-create-file-button "bitbucket" "Elisp Code.org" "~/Dropbox/Code/Elisp.org")
   (insert "\n")
   (ndk-dashboard-create-file-button "bitbucket" "Themes.org" "~/Dropbox/Code/Themes.org")
+  (insert "\n")
+  (ndk-dashboard-create-file-button "bitbucket" "ndk-tools.org" "~/.doom.d/ndk-tools.org")
   (insert "\n"))
 
 (defun ndk-dashboard-work-section ()
