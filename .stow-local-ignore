@@ -2,3 +2,5 @@
 misc
 #LICENSE
 ^/.*\.org
+.DS_STORE
+clean_DS_STORE.sh
