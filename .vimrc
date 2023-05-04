@@ -5,7 +5,11 @@ set background=dark
 set clipboard=unnamed
 set directory^=$HOME/.vim/tmp//
 
-" Use neosolarized_termtrans=1
+" Show line number
+set number
+set relativenumber
+
+" Use neosolarize theme
 let g:neosolarized_termtrans=1
 runtime ./colors/NeoSolarized.vim
 colorscheme NeoSolarized
@@ -63,7 +67,7 @@ nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
-" Relad syntax
+" Reload syntax
 nnoremap <leader>r :exe ':syn off \| :syn on'<CR>
 
 " Vim Markdown
