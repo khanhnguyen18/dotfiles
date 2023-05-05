@@ -26,6 +26,7 @@ call plug#begin()
   Plug 'vim-scripts/ReplaceWithRegister'
   Plug 'godlygeek/tabular'
   Plug 'preservim/vim-markdown'
+  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npm install' }
 call plug#end()
 
 " Mapping Section ----------------------------------------
@@ -98,6 +99,10 @@ function! MarkdownSwitchStatus()
 endfunction
 nnoremap <leader>s :call MarkdownSwitchStatus()<CR>
 
+" Markdown preview
+nmap <C-s> <Plug>MarkdownPreview
+nmap <Leader>p <Plug>MarkdownPreviewStop
+nmap <C-p> <Plug>MarkdownPreviewToggle
 
 
 
