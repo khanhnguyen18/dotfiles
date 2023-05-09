@@ -27,6 +27,7 @@ call plug#begin()
   Plug 'godlygeek/tabular'
   Plug 'preservim/vim-markdown'
   Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npm install' }
+  Plug 'tpope/vim-fugitive'
 call plug#end()
 
 " Mapping Section ----------------------------------------
@@ -50,14 +51,15 @@ nnoremap sl <C-w>l
 " New tab
 nnoremap te :tabedit<CR>
 
-" Resize window
+" Esc
+inoremap jk <esc> 
 
 " Select all
 nnoremap <C-a> gg<S-v>G
 
 " Leader tools
 nnoremap <leader>w :w<CR>
-nnoremap <leader>o :so<CR>
+nnoremap <leader>o <C-w><C-o>
 
 " Change page up/down
 nnoremap <C-d> <C-d>zz
@@ -104,6 +106,7 @@ nmap <C-s> <Plug>MarkdownPreview
 nmap <Leader>p <Plug>MarkdownPreviewStop
 nmap <C-p> <Plug>MarkdownPreviewToggle
 
-
+" Vim fugitive
+nnoremap gs :G<CR>
 
 
