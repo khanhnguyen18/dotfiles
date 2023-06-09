@@ -8,7 +8,7 @@ hi def htmlH5 guifg=DarkOrchid
 hi def mkdHeading ctermfg=11
 hi def mkdLink ctermfg=6
 hi def mkdDelimiter ctermfg=3
-hi def mkdBlockQuote ctermfg=39
+hi def mkdBlockquote ctermfg=39
 " 15
 hi def mkdURL ctermfg=4
 
