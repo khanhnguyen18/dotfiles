@@ -76,7 +76,7 @@ nnoremap <C-f> :NERDTreeFind<CR>
 nnoremap <leader>r :exe ':w \| :syn off \| :syn on'<CR>
 
 " Vim Markdown
-let g:vim_markdown_folding_disabled=1
+let g:vim_markdown_folding_disabled = 1
 
 function! MarkdownSwitchStatus()
   let current_line = getline('.')
@@ -131,3 +131,6 @@ nnoremap <leader>' :Marks<CR>
 nnoremap <leader>f :Rg<CR>
 nnoremap <leader>g :Commits<CR>
 nnoremap <leader>H :Helptags<CR>
+nnoremap <leader>hh :History<CR>
+nnoremap <leader>h: :History:<CR>
+nnoremap <leader>h/ :History/<CR>
