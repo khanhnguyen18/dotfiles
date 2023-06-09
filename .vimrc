@@ -28,6 +28,8 @@ call plug#begin()
   Plug 'preservim/vim-markdown'
   Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npm install' }
   Plug 'tpope/vim-fugitive'
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/fzf.vim'
 call plug#end()
 
 " Mapping Section ----------------------------------------
@@ -58,7 +60,7 @@ inoremap jk <esc>
 nnoremap <C-a> gg<S-v>G
 
 " Leader tools
-nnoremap <leader>w :w<CR>
+nnoremap <leader>q :wq<CR>
 nnoremap <leader>o <C-w><C-o>
 
 " Change page up/down
@@ -71,10 +73,10 @@ nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
 " Reload syntax
-nnoremap <leader>r :exe ':syn off \| :syn on'<CR>
+nnoremap <leader>r :exe ':w \| :syn off \| :syn on'<CR>
 
 " Vim Markdown
-let g:vim_markdown_folding_level=2
+let g:vim_markdown_folding_disabled=1
 
 function! MarkdownSwitchStatus()
   let current_line = getline('.')
@@ -109,4 +111,23 @@ nmap <C-p> <Plug>MarkdownPreviewToggle
 " Vim fugitive
 nnoremap gs :G<CR>
 
+nmap <leader>z :call <SID>SynStack()<CR>
+function! <SID>SynStack()
+  if !exists("*synstack")
+    return
+  endif
+  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
 
+" Vim markdown anchor
+let g:vim_markdown_follow_anchor = 1
+let g:vim_markdown_anchorexpr = "'>'.v:anchor"
+
+" Vim fuzzy finder
+nnoremap <leader>b :Buffers<CR>
+nnoremap <C-f> :BLines<CR>
+nnoremap <leader>/ :Files<CR>
+nnoremap <leader>' :Marks<CR>
+nnoremap <leader>f :Rg<CR>
+nnoremap <leader>g :Commits<CR>
+nnoremap <leader>H :Helptags<CR>
