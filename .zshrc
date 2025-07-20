@@ -1,4 +1,4 @@
-DISPLAY=1 SSH_ASKPASS="~/help.sh" ssh-add ~/.ssh/id < /dev/null
+DISPLAY=1 SSH_ASKPASS="$HOME/help.sh" ssh-add ~/.ssh/id_rsa < /dev/null
 # eval "$(ssh-agent -s)"
 # My alias
 alias common="emacs $HOME/Dropbox/work/common.org"
