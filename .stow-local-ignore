@@ -4,3 +4,4 @@ misc
 ^/.*\.org
 .DS_STORE
 clean_DS_STORE.sh
+.idea

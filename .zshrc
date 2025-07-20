@@ -1,7 +1,6 @@
-# DISPLAY=1 SSH_ASKPASS="/Users/khanh/SOFT/aduro/aduro_passphase.sh" ssh-add ~/.ssh/id_aduro < /dev/null
+DISPLAY=1 SSH_ASKPASS="~/help.sh" ssh-add ~/.ssh/id < /dev/null
 # eval "$(ssh-agent -s)"
 # My alias
-# alias copy_aduro_pass="echo 'NewUser1!' | tr -d '\n' | pbcopy"
 alias common="emacs $HOME/Dropbox/work/common.org"
 alias daily="$HOME/Dropbox/SOFT/bin/daily"
 alias vim=nvim
