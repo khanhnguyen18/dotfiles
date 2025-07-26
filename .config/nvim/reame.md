@@ -10,3 +10,7 @@
 - "leader x": close buffer
 - `Leader n`: Next **Buffer**
 
+5. Comment and Copy to clipboard
+
+- `Leader/`: Comment
+- `Leadery`: Copy to clipboard

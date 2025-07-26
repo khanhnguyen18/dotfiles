@@ -9,3 +9,6 @@ vim.keymap.set("n", "<leader>e", ":NvimTreeFindFileToggle<cr>")
 
 -- nvim-comment
 vim.keymap.set({"n", "v"}, "<leader>/", ":CommentToggle<cr>")
+
+-- lsp format
+vim.keymap.set("n", "<leader>fmd", ":silent !black %<cr>")

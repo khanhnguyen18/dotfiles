@@ -4,6 +4,8 @@ DISPLAY=1 SSH_ASKPASS="$HOME/help.sh" ssh-add ~/.ssh/id_rsa < /dev/null
 alias common="emacs $HOME/Dropbox/work/common.org"
 alias daily="$HOME/Dropbox/SOFT/bin/daily"
 alias vim=nvim
+alias pip=pip3
+alias python=python3
 
 alias copy_first_commit="git --no-pager log -n 1 --pretty=format:"%h"|pbcopy"
 # Path to your oh-my-zsh installation.
@@ -30,3 +32,6 @@ export PATH="$PATH:$HOME/.dotfiles/bin"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Created by `pipx` on 2025-07-25 01:19:50
+export PATH="$PATH:/Users/khanh/.local/bin"
