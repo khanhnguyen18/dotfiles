@@ -14,3 +14,8 @@
 
 - `Leader/`: Comment
 - `Leadery`: Copy to clipboard
+
+6. Lsp Mason
+
+
+7. Auto session
