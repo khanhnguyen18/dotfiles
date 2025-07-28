@@ -1,9 +1,6 @@
-import pandas as pd
 
-import requests
-
-
-
-def a(d: str):
-    # pd.read_csv()
-    print("Stuff")
+a =1
+b=2
+c=a+b
+print("Hello,")
+print("World!")

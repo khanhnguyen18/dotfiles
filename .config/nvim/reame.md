@@ -19,3 +19,10 @@
 
 
 7. Auto session
+
+8. Debug python
+   - Run command
+```shwll
+masonIntall debugpy
+```
+   - replace the path 
