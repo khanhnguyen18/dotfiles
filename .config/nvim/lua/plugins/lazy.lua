@@ -34,16 +34,16 @@ require("lazy").setup({
         end,
     },
 
-    -- Save and load buffers (a session) automatically for each folder
-    {
-        'rmagatti/auto-session',
-        config = function()
-            require("auto-session").setup {
-                log_level = "error",
-                auto_session_suppress_dirs = { "~/", "~/Downloads" },
-            }
-        end
-    },
+    ---- Save and load buffers (a session) automatically for each folder
+    --{
+    --    'rmagatti/auto-session',
+    --    config = function()
+    --        require("auto-session").setup {
+    --            log_level = "error",
+    --            auto_session_suppress_dirs = { "~/", "~/Downloads" },
+    --        }
+    --    end
+    --},
     -- Visualize buffers as tabs
     { 'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons' },
 
@@ -114,6 +114,7 @@ require("lazy").setup({
                     ['<C-d>'] = cmp.mapping.scroll_docs(4),
                     ['<C-f>'] = cmp_action.luasnip_jump_forward(),
                     ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+                    ["<CR>"] = cmp.mapping.confirm({ select = false }),
                 })
             })
         end
@@ -155,7 +156,7 @@ require("lazy").setup({
             })
         end
     },
-    -- Debug in nvim
+    -- Debug in nvim with dap
     {
         "mfussenegger/nvim-dap",
         dependencies = {
@@ -205,22 +206,27 @@ require("lazy").setup({
             local opts = { noremap = true, silent = true }
 
             -- Toggle breakpoint
-            vim.keymap.set("n", "<leader>db", function()
+            vim.keymap.set("n", "<F2>", function()
                 dap.toggle_breakpoint()
             end, opts)
 
             -- Continue / Start
-            vim.keymap.set("n", "<leader>dc", function()
+            vim.keymap.set("n", "<F10>", function()
                 dap.continue()
             end, opts)
 
+            --
+            vim.keymap.set("n", "<F5>", function()
+                dap.run_last()
+            end, opts)
+
             -- Step Over
-            vim.keymap.set("n", "<leader>do", function()
+            vim.keymap.set("n", "<F8>", function()
                 dap.step_over()
             end, opts)
 
             -- Step Into
-            vim.keymap.set("n", "<leader>di", function()
+            vim.keymap.set("n", "<F7>", function()
                 dap.step_into()
             end, opts)
 
